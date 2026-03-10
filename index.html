@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SeedSplitter — Protegiendo Soberanías</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --green: #00ff88;
+      --green-dim: #00cc6a;
+      --green-dark: #003d1f;
+      --orange: #ff6b00;
+      --gray: #1a1a1a;
+      --gray2: #2a2a2a;
+      --text: #e8e8e8;
+      --text-dim: #888;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Barlow', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    /* NOISE TEXTURE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,255,136,0.1);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      color: var(--green);
+      letter-spacing: 2px;
+    }
+
+    .nav-logo span {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      display: block;
+      letter-spacing: 3px;
+    }
+
+    .nav-cta {
+      background: var(--green);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem 1.4rem;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--green-dim); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 11rem 2.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .hero-glow {
+      position: absolute;
+      top: 20%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-badge {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--green);
+      letter-spacing: 4px;
+      border: 1px solid rgba(0,255,136,0.3);
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -2px;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .hero h1 .split { color: var(--green); }
+
+    .hero-sub {
+      font-size: 1.2rem;
+      color: var(--text-dim);
+      font-weight: 300;
+      line-height: 1.6;
+      margin: 1.5rem 0 2.5rem;
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    .hero-sub strong { color: var(--text); font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s ease forwards;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .btn-primary:hover::after { transform: translateX(0); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 1rem;
+      padding: 1rem 2rem;
+      border: 1px solid var(--gray2);
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* PRODUCT IMAGE */
+    .hero-image {
+      position: relative;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .product-frame {
+      position: relative;
+      background: var(--gray);
+      border: 1px solid rgba(0,255,136,0.2);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-frame::before {
+      content: 'PCB REAL — SIN CARCASA — SIN SECRETOS';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--green);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      padding: 2px 10px;
+      white-space: nowrap;
+    }
+
+    .product-frame img {
+      width: 100%;
+      max-width: 380px;
+      display: block;
+      filter: brightness(1.05) contrast(1.05);
+    }
+
+    /* REEMPLAZAR CON IMAGEN REAL */
+    .product-placeholder {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #111 0%, #1a2a1a 50%, #111 100%);
+      border: 2px dashed rgba(0,255,136,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      color: rgba(0,255,136,0.5);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .product-placeholder .icon {
+      font-size: 2.5rem;
+      opacity: 0.4;
+    }
+
+    .corner {
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: var(--green);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+    .corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      opacity: 0.3;
+      animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+
+    /* STATS */
+    .stats-bar {
+      background: var(--green-dark);
+      border-top: 1px solid rgba(0,255,136,0.2);
+      border-bottom: 1px solid rgba(0,255,136,0.2);
+      padding: 1.5rem 2.5rem;
+    }
+
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 1.8rem;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+      letter-spacing: 1px;
+    }
+
+    /* URGENCY BANNER */
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 2.5rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .counter-section {
+      padding: 4rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .counter-box {
+      background: var(--gray);
+      border: 1px solid rgba(0,255,136,0.15);
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .price-block { }
+
+    .price-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+    }
+
+    .price-current {
+      font-size: 4rem;
+      font-weight: 900;
+      color: var(--green);
+      line-height: 1;
+      font-family: var(--mono);
+    }
+
+    .price-current span {
+      font-size: 1.5rem;
+      opacity: 0.7;
+    }
+
+    .price-next {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .price-next s { color: var(--text-dim); }
+    .price-next strong { color: var(--text); }
+
+    .units-block { }
+
+    .units-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--gray2);
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--green);
+      width: 23%;
+      position: relative;
+      transition: width 1s ease;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: white;
+      opacity: 0.8;
+    }
+
+    .units-count {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .units-count strong { color: var(--green); font-size: 1.1rem; }
+
+    /* HOW IT WORKS */
+    .section {
+      padding: 5rem 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 5px;
+      color: var(--green);
+      margin-bottom: 1rem;
+    }
+
+    .section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 3rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .step {
+      background: var(--gray);
+      padding: 2.5rem 2rem;
+      border-top: 3px solid transparent;
+      transition: border-color 0.3s;
+      position: relative;
+    }
+
+    .step:hover { border-top-color: var(--green); }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 3rem;
+      color: rgba(0,255,136,0.15);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* TRUST */
+    .trust-section {
+      background: var(--gray);
+      padding: 5rem 2.5rem;
+      border-top: 1px solid var(--gray2);
+      border-bottom: 1px solid var(--gray2);
+    }
+
+    .trust-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-top: 3rem;
+    }
+
+    .trust-item {
+      background: var(--black);
+      padding: 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .trust-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+      width: 3rem;
+      text-align: center;
+    }
+
+    .trust-item h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--green);
+      font-family: var(--mono);
+      letter-spacing: 1px;
+    }
+
+    .trust-item p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* USE CASES */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 3rem;
+    }
+
+    .case-card {
+      background: var(--gray);
+      padding: 2rem;
+      border-left: 3px solid var(--green-dark);
+      transition: border-left-color 0.3s;
+    }
+
+    .case-card:hover { border-left-color: var(--green); }
+
+    .case-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .case-card p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* FAQ */
+    .faq-list {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .faq-item {
+      background: var(--gray);
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .faq-q {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      gap: 1rem;
+    }
+
+    .faq-q .arrow {
+      font-family: var(--mono);
+      color: var(--green);
+      font-size: 1.2rem;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+
+    details.faq-item { list-style: none; }
+    details.faq-item summary { list-style: none; }
+    details.faq-item summary::-webkit-details-marker { display: none; }
+
+    .faq-a {
+      padding: 1.5rem 2rem;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      border-top: 1px solid var(--gray2);
+    }
+
+    details[open] .arrow { transform: rotate(45deg); }
+
+    .recovery-banner {
+      margin-top: 2px;
+      background: linear-gradient(135deg, var(--green-dark) 0%, #001a0d 100%);
+      border: 1px solid rgba(0,255,136,0.25);
+      padding: 2rem 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .rb-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .rb-title {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--green);
+      margin-bottom: 0.6rem;
+    }
+
+    .recovery-banner p {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    .recovery-banner p strong { color: var(--text); }
+
+    /* HONEYPOT */
+    .honeypot-section {
+      background: linear-gradient(180deg, #0d0d0d 0%, #110800 50%, #0d0d0d 100%);
+      padding: 5rem 2.5rem;
+      border-top: 1px solid rgba(255,107,0,0.15);
+      border-bottom: 1px solid rgba(255,107,0,0.15);
+    }
+
+    .honeypot-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .honeypot-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+
+    .honeypot-side {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .honeypot-card {
+      background: rgba(255,107,0,0.05);
+      border: 1px solid rgba(255,107,0,0.15);
+      padding: 2rem;
+      transition: border-color 0.3s;
+    }
+
+    .honeypot-card:hover { border-color: rgba(255,107,0,0.4); }
+
+    .main-card {
+      background: rgba(255,107,0,0.08);
+      border-color: rgba(255,107,0,0.3);
+    }
+
+    .hc-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .honeypot-card h3 {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      color: var(--orange);
+      margin-bottom: 0.75rem;
+    }
+
+    .honeypot-card p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    .hc-tag {
+      margin-top: 1.5rem;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: rgba(255,107,0,0.5);
+      border-top: 1px solid rgba(255,107,0,0.15);
+      padding-top: 1rem;
+    }
+
+    .honeypot-scenario {
+      background: var(--gray);
+      border: 1px solid rgba(255,107,0,0.2);
+      padding: 2.5rem;
+      margin-top: 2px;
+    }
+
+    .scenario-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      color: var(--orange);
+      margin-bottom: 2rem;
+    }
+
+    .scenario-steps {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .sc-step {
+      flex: 1;
+      min-width: 150px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .sc-num {
+      background: var(--gray2);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .sc-step p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .sc-arrow {
+      font-family: var(--mono);
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .sc-arrow.sc-alert { color: var(--orange); font-size: 1.5rem; }
+
+    .alert-step p { color: var(--text); }
+
+    @media (max-width: 768px) {
+      .honeypot-grid { grid-template-columns: 1fr; }
+      .scenario-steps { flex-direction: column; }
+      .sc-arrow { transform: rotate(90deg); }
+    }
+
+    /* BUY */
+    .buy-section {
+      background: linear-gradient(135deg, #0a1a0f 0%, var(--black) 50%, #0a1a0f 100%);
+      padding: 6rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .buy-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .buy-inner {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .buy-inner h2 {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .buy-inner p {
+      color: var(--text-dim);
+      margin-bottom: 3rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .buy-price-big {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--text-dim);
+      letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+    }
+
+    .buy-amount {
+      font-family: var(--mono);
+      font-size: 3.5rem;
+      color: var(--green);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .buy-note {
+      font-size: 0.8rem;
+      color: var(--orange);
+      font-family: var(--mono);
+      letter-spacing: 2px;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-buy {
+      background: var(--green);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1.2rem 3rem;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 2px;
+      display: inline-block;
+      text-decoration: none;
+      transition: all 0.2s;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn-buy:hover {
+      background: var(--green-dim);
+      transform: translateY(-2px);
+    }
+
+    .buy-contact {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .buy-contact a {
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #050505;
+      padding: 2.5rem;
+      text-align: center;
+      border-top: 1px solid var(--gray2);
+    }
+
+    footer .logo {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      color: var(--green);
+      letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+    }
+
+    footer p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      font-family: var(--mono);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero-content { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-image { order: -1; }
+      .steps { grid-template-columns: 1fr; }
+      .trust-grid { grid-template-columns: 1fr; }
+      .cases-grid { grid-template-columns: 1fr; }
+      .counter-box { grid-template-columns: 1fr; gap: 2rem; }
+      .stats-inner { flex-direction: column; gap: 1.5rem; }
+      nav { padding: 1rem 1.5rem; }
+      .section { padding: 3rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      SEED<span style="color:var(--green)">SPLITTER</span>
+      <span>PROTEGIENDO SOBERANÍAS</span>
+    </div>
+    <a href="#comprar" class="nav-cta">COMPRAR AHORA</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-badge">HARDWARE · OFFLINE · OPEN</div>
+        <h1>
+          TU SEED.<br>
+          EN TRES<br>
+          <span class="split">PARTES.</span>
+        </h1>
+        <p class="hero-sub">
+          Dividí tu clave de Bitcoin en 3 partes — cada una una
+          <strong>seed phrase válida y funcional.</strong>
+          Sin internet. Sin servidor. Sin secretos.
+          Y con trampa incluida para quien te las quiera robar.
+        </p>
+        <div class="hero-actions">
+          <a href="#comprar" class="btn-primary">QUIERO UNO — $15.000</a>
+          <a href="#como-funciona" class="btn-secondary">VER CÓMO FUNCIONA</a>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <div class="product-frame">
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+          <div class="scan-line"></div>
+          <!-- REEMPLAZAR EL DIV DE ABAJO CON: <img src="foto-seedsplitter.jpg" alt="SeedSplitter"> -->
+          <div class="product-placeholder">
+            <div class="icon">📷</div>
+            REEMPLAZAR CON<br>FOTO DEL PRODUCTO<br><br>
+            <small style="opacity:0.5">Ejemplo: &lt;img src="foto.jpg"&gt;</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">PARTES<br>INDEPENDIENTES</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">CONEXIONES<br>A INTERNET</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">DATOS<br>GUARDADOS</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">HARDWARE<br>VISIBLE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTER / PRECIO -->
+  <div style="max-width:1100px; margin:0 auto; padding:4rem 2.5rem;">
+    <div class="counter-box">
+      <div class="price-block">
+        <div class="price-label">// PRECIO DE LANZAMIENTO</div>
+        <div class="price-current"><span>$</span>15.000 <span style="font-size:1rem;color:var(--text-dim)">ARS</span></div>
+        <div class="price-next" style="margin-top:0.75rem;">
+          Próxima tanda (500 unidades): <strong>$60.000 ARS</strong>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <a href="#comprar" class="btn-primary" style="font-size:0.9rem; padding:0.8rem 1.5rem;">
+            ASEGURAR MI UNIDAD →
+          </a>
+        </div>
+      </div>
+      <div class="units-block">
+        <div class="units-label">// DISPONIBILIDAD — PRIMERA TANDA</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress"></div>
+        </div>
+        <div class="units-count">
+          <strong id="sold">23</strong> / 100 unidades vendidas
+        </div>
+        <div style="margin-top:1rem; font-size:0.8rem; color:var(--text-dim); line-height:1.6;">
+          Una vez agotadas las 100 unidades,<br>
+          el siguiente lote sale a <span style="color:var(--orange);">$60.000</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="como-funciona">
+    <div class="section-tag">// CÓMO FUNCIONA</div>
+    <h2>Simple. Seguro.<br>Sin misterios.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Ingresás tu seed phrase</h3>
+        <p>Usando los 3 botones del dispositivo, ingresás las palabras de tu clave. Todo ocurre localmente, sin salir del hardware.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Genera 3 seed phrases válidas</h3>
+        <p>No son fragmentos inútiles — son wallets reales y funcionales. Cada parte puede abrirse en cualquier wallet compatible con BIP39. Necesitás 2 de las 3 para reconstruir la original.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Guardás cada parte en un lugar distinto</h3>
+        <p>En casa, en el banco, con un familiar de confianza. Ninguna parte sirve sola. Tu Bitcoin queda protegido.</p>
+      </div>
+      <div class="step" style="border-top: 3px solid rgba(0,255,136,0.3);">
+        <div class="step-num">04</div>
+        <h3>Si perdés el dispositivo, no perdés nada</h3>
+        <p>Con el software que te incluimos, podés reconstruir tu clave original desde cualquier computadora — sin necesitar el hardware nunca más.</p>
+      </div>
+    </div>
+
+    <div class="recovery-banner">
+      <div class="rb-icon">🛡️</div>
+      <div style="flex:1;">
+        <div class="rb-title">TU CLAVE NO DEPENDE DEL HARDWARE</div>
+        <p>El dispositivo es una herramienta, no una dependencia. Si se rompe, se pierde o lo destruís adrede, podés recuperar tu Bitcoin usando solo las 2 partes y el software incluido. Sin el dispositivo. Sin nosotros. Sin intermediarios.</p>
+        <div style="margin-top:1.2rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+          <a href="https://github.com/TU-USUARIO/seedsplitter/blob/main/recover.py"
+             target="_blank"
+             style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--green); color:var(--black); font-family:var(--mono); font-size:0.8rem; font-weight:700; padding:0.6rem 1.2rem; text-decoration:none; letter-spacing:1px;">
+            ⬇ DESCARGAR SCRIPT DE RECUPERACIÓN
+          </a>
+          <span style="font-family:var(--mono); font-size:0.7rem; color:var(--text-dim); letter-spacing:1px;">
+            Código abierto · Auditalo vos mismo en GitHub
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust-section">
+    <div class="trust-inner">
+      <div class="section-tag">// POR QUÉ CONFIAR</div>
+      <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight:900; letter-spacing:-1px; line-height:1.1; margin-bottom:0;">
+        Lo que ves<br>es todo lo que hay.
+      </h2>
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon">📡</div>
+          <div>
+            <h3>SIN WIFI NI BLUETOOTH</h3>
+            <p>El dispositivo no tiene ningún módulo de comunicación inalámbrica. Es físicamente imposible que envíe tus datos a algún lado. Podés comprobarlo vos mismo mirando el circuito.</p>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">💾</div>
+          <div>
+            <h3>SIN MEMORIA PERSISTENTE</h3>
+            <p>SeedSplitter no guarda nada. Una vez que apagás el dispositivo, no queda ningún rastro de tu clave. Cero datos almacenados.</p>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🔬</div>
+          <div>
+            <h3>HARDWARE 100% VISIBLE</h3>
+            <p>No hay carcasa que oculte nada. Podés ver cada componente del circuito. Esta transparencia no es un defecto — es la mayor garantía de seguridad que podemos darte.</p>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">🔐</div>
+          <div>
+            <h3>ALGORITMO PROBADO</h3>
+            <p>Basado en el esquema de división de secretos de Shamir, matemáticamente demostrado y usado por empresas de seguridad en todo el mundo hace décadas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HONEYPOT SECTION -->
+  <section class="honeypot-section">
+    <div class="honeypot-inner">
+      <div class="section-tag" style="color:var(--orange);">// FEATURE EXCLUSIVA</div>
+      <h2 style="font-size:clamp(2rem,4vw,3.2rem); font-weight:900; letter-spacing:-1px; line-height:1.1; margin-bottom:1rem;">
+        Cada parte es<br><span style="color:var(--orange);">una trampa.</span>
+      </h2>
+      <p style="color:var(--text-dim); font-size:1.1rem; line-height:1.7; max-width:600px; margin-bottom:3.5rem;">
+        Las 3 partes que genera SeedSplitter son <strong style="color:var(--text)">seed phrases 100% válidas y funcionales</strong> — no fragmentos cifrados. Podés abrirlas en cualquier wallet. Y eso te da un superpoder que ninguna otra solución tiene.
+      </p>
+
+      <div class="honeypot-grid">
+        <div class="honeypot-card main-card">
+          <div class="hc-icon">🍯</div>
+          <h3>HONEYPOT WALLET</h3>
+          <p>
+            Cargá cada parte con una pequeña cantidad de Bitcoin — $5, $10, lo que quieras.
+            Si alguien encuentra una parte y mueve esos fondos,
+            <strong>te enterás al instante</strong> que fue comprometida.
+          </p>
+          <p style="margin-top:1rem;">
+            Es seguridad activa. No esperás a descubrir el robo cuando ya es tarde — el ladrón te avisa él solo.
+          </p>
+          <div class="hc-tag">CANARY WALLET · TÉCNICA USADA EN CIBERSEGURIDAD EMPRESARIAL</div>
+        </div>
+
+        <div class="honeypot-side">
+          <div class="honeypot-card">
+            <div class="hc-icon">🎭</div>
+            <h3>IMPOSIBLE DE DISTINGUIR</h3>
+            <p>Quien encuentra una parte no sabe si es la "real", una de las 3, o directamente una trampa. La ambigüedad es parte de la seguridad.</p>
+          </div>
+          <div class="honeypot-card">
+            <div class="hc-icon">📡</div>
+            <h3>ALERTA INMEDIATA</h3>
+            <p>Configurá cualquier wallet watcher para monitorear las direcciones honeypot. Si se mueven fondos, tu seed fue descubierta.</p>
+          </div>
+          <div class="honeypot-card">
+            <div class="hc-icon">🔑</div>
+            <h3>WALLETS REALES, NO FRAGMENTOS</h3>
+            <p>A diferencia de otros esquemas, las partes de SeedSplitter son wallets BIP39 válidas. Compatibles con Electrum, Sparrow, Ledger y más.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="honeypot-scenario">
+        <div class="scenario-label">// ESCENARIO REAL</div>
+        <div class="scenario-steps">
+          <div class="sc-step">
+            <span class="sc-num">1</span>
+            <p>Guardás la Parte A en tu casa con <strong>0.0001 BTC</strong> como anzuelo</p>
+          </div>
+          <div class="sc-arrow">→</div>
+          <div class="sc-step">
+            <span class="sc-num">2</span>
+            <p>Alguien entra a tu casa y encuentra el papel</p>
+          </div>
+          <div class="sc-arrow">→</div>
+          <div class="sc-step">
+            <span class="sc-num">3</span>
+            <p>Mueve el Bitcoin del anzuelo</p>
+          </div>
+          <div class="sc-arrow sc-alert">→</div>
+          <div class="sc-step alert-step">
+            <span class="sc-num" style="background:var(--orange);">!</span>
+            <p><strong style="color:var(--orange);">Recibís la alerta.</strong> Sabés que la Parte A fue comprometida. Reorganizás antes de que lleguen a las otras.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="section">
+    <div class="section-tag">// CASOS DE USO</div>
+    <h2>¿Para quién es<br>SeedSplitter?</h2>
+    <div class="cases-grid">
+      <div class="case-card">
+        <h3>🏠 El holder tranquilo</h3>
+        <p>Guardás una parte en casa, otra en una caja de seguridad del banco, y la tercera con un familiar de confianza. Perdés una y seguís teniendo acceso.</p>
+      </div>
+      <div class="case-card">
+        <h3>✈️ El viajero frecuente</h3>
+        <p>No tenés que llevar tu seed completa cuando viajás. Llevás solo 1 de las 3 partes. Sola, no sirve para nada.</p>
+      </div>
+      <div class="case-card">
+        <h3>👨‍👩‍👧 El que piensa en el futuro</h3>
+        <p>Distribuís las 3 partes entre tus herederos. Nadie puede acceder solo, pero juntos pueden recuperar todo si algo te pasa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" style="padding-top:0;">
+    <div class="section-tag">// PREGUNTAS FRECUENTES</div>
+    <h2>Todo lo que<br>querés saber.</h2>
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Qué pasa si se rompe o pierdo el dispositivo?<span class="arrow">+</span></summary>
+        <div class="faq-a">No perdés nada. El dispositivo es solo una herramienta para generar las partes — una vez que las tenés guardadas, ya no lo necesitás. Con el software que te incluimos al comprar, podés reconstruir tu clave original desde cualquier computadora usando 2 de las 3 partes. Sin el hardware, sin llamarnos, sin depender de nadie.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Cómo sé que el dispositivo no guarda mi seed?<span class="arrow">+</span></summary>
+        <div class="faq-a">El hardware es completamente visible. No hay memoria flash ni chip de almacenamiento. Podés verificarlo por tu cuenta o pedirle a alguien técnico que lo confirme. La transparencia del diseño es la garantía.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Qué pasa si pierdo una de las 3 partes?<span class="arrow">+</span></summary>
+        <div class="faq-a">No pasa nada. El sistema requiere solo 2 de las 3 partes para reconstruir la clave original. Podés perder una parte sin perder el acceso a tus fondos.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Funciona con cualquier wallet de Bitcoin?<span class="arrow">+</span></summary>
+        <div class="faq-a">Sí. SeedSplitter trabaja con seed phrases estándar BIP39 (12 o 24 palabras), que son compatibles con la gran mayoría de wallets: Electrum, Sparrow, Ledger, Trezor, y muchos más.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Necesito conectarlo a una computadora?<span class="arrow">+</span></summary>
+        <div class="faq-a">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás una batería o fuente de alimentación simple. No hay software que instalar ni computadora involucrada.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">¿Por qué el precio es tan bajo si protege tanto dinero?<span class="arrow">+</span></summary>
+        <div class="faq-a">Este es el precio de lanzamiento para las primeras 100 unidades. Queremos que la mayor cantidad de gente pueda acceder a esta protección. A partir de la segunda tanda, el precio sube a $60.000.</div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <section class="buy-section" id="comprar">
+    <div class="buy-inner">
+      <div class="section-tag" style="margin-bottom:1rem;">// CONSEGUÍ EL TUYO</div>
+      <h2>Protegé tu<br><span style="color:var(--green)">soberanía.</span></h2>
+      <p>No confíes en nadie más con tu seed phrase.<br>Dividila. Distribuila. Durmí tranquilo.</p>
+      <div class="buy-price-big">PRECIO DE LANZAMIENTO</div>
+      <div class="buy-amount">$15.000 ARS</div>
+      <div class="buy-note">⚡ SOLO PRIMERAS 100 UNIDADES — DESPUÉS $60.000</div>
+      <!-- REEMPLAZAR href CON TU LINK DE MERCADO PAGO / WHATSAPP / ETC -->
+      <a href="https://wa.me/+54TUNUMERO?text=Quiero%20un%20SeedSplitter" class="btn-buy" target="_blank">
+        COMPRAR POR WHATSAPP →
+      </a>
+      <div class="buy-contact">
+        ¿Tenés preguntas? Escribinos a
+        <a href="/cdn-cgi/l/email-protection#274448495346445348675442424354574b4e535342550944484a094655"><span class="__cf_email__" data-cfemail="12717d7c667371667d526177777661627e7b666677603c717d7f3c7360">[email&#160;protected]</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">SEED SPLITTER</div>
+    <p>PROTEGIENDO SOBERANÍAS · HECHO EN ARGENTINA</p>
+  </footer>
+
+  <script>
+    // FAQ Toggle — inline style approach, no CSS class dependency
+    function initFaq() {
+      var items = document.querySelectorAll('.faq-item');
+      items.forEach(function(item) {
+        var answer = item.querySelector('.faq-a');
+        var arrow = item.querySelector('.arrow');
+        // Make sure answer starts hidden
+        answer.style.maxHeight = '0';
+        answer.style.overflow = 'hidden';
+        answer.style.transition = 'max-height 0.3s ease';
+        answer.style.padding = '0 2rem';
+
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', function() {
+          var isOpen = item.getAttribute('data-open') === 'true';
+          // Close all
+          items.forEach(function(i) {
+            i.querySelector('.faq-a').style.maxHeight = '0';
+            i.querySelector('.faq-a').style.padding = '0 2rem';
+            i.querySelector('.arrow').style.transform = 'rotate(0deg)';
+            i.setAttribute('data-open', 'false');
+          });
+          // Open clicked if it was closed
+          if (!isOpen) {
+            answer.style.maxHeight = '400px';
+            answer.style.padding = '1.5rem 2rem';
+            arrow.style.transform = 'rotate(45deg)';
+            item.setAttribute('data-open', 'true');
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFaq);
+    } else {
+      initFaq();
+    }
+
+    // Animate progress bar on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('progress').style.width = '23%';
+      }, 500);
+    });
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click',
