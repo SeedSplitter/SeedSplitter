@@ -19,7 +19,7 @@ def recover_seed(share0_words, share1_words):
     # Aritmética en GF(2^8) con polinomio irreducible de Rijndael (0x11b)
     GF256 = galois.GF(2**8, irreducible_poly=0x11b)
 
-    mnemo = Mnemonic(lang)
+    mnemo = Mnemonic("english")
 
     x0 = GF256(mnemo.wordlist.index(share0_words[-1]) % 4)
     x1 = GF256(mnemo.wordlist.index(share1_words[-1]) % 4)
