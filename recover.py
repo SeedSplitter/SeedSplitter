@@ -10,7 +10,6 @@ def recover_seed(share0_words, share1_words):
     ----------
     share0_words : lista de 12/24 palabras del primer share
     share1_words : lista de 12/24 palabras del segundo share
-    lang         : idioma de las palabras BIP39 (default: "english")
 
     Retorna
     -------
