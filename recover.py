@@ -1,3 +1,7 @@
+## Recupera una seed phase a partir de dos partes. 
+## Se recomienda ejecutar el script en un Live OS (como Tails o Ubuntu) 
+## desde un USB, en una PC air-gapped (sin conexión a internet).
+
 from pyfinite import ffield
 from mnemonic import Mnemonic
 
