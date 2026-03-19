@@ -8,7 +8,7 @@ from mnemonic import Mnemonic
 share0_words = input(f"Ingresá las palabras del share 1 (separadas por espacio):\n")
 share1_words = input(f"Ingresá las palabras del share 2 (separadas por espacio):\n")
 
-F = ffield.FField(8, gen=283)
+F = ffield.FField(8, gen=283, useLUT=0)
 mnemo = Mnemonic("english")
 
 sb0 = mnemo.to_entropy(share0_words)
