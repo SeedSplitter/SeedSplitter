@@ -11,10 +11,10 @@ Para compilar, configura el Arduino IDE con los siguientes parámetros:
 1.  **Placa:** `Generic STM32F1 series`
 2.  **Board part number:** `BluePill F103C8`
 3.  **Upload Method:** `STM32CubeProgrammer (SWD)`
-4.  **USB Support:** `None` o `CDC (generic Serial superimpose UART)`
+4.  **USB Support:** `CDC (generic Serial supersede U(S)ART)`
 5.  **Librerías necesarias:**
     * `Tiny4kOLED`: Para el manejo de la pantalla SSD1306.
-    * `sha256`: Para la generación de checksums y entropía.
+    * `Crypto`: Para la generación de checksums con SHA256.
 
 **Configuración IDE:** Exceptuando los parámetros mencionados arriba, el resto de las configuraciones del Arduino IDE pueden dejarse por defecto.
 
