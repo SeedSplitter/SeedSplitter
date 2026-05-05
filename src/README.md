@@ -16,12 +16,14 @@ Para compilar, configura el Arduino IDE con los siguientes parámetros:
     * `Tiny4kOLED`: Para el manejo de la pantalla SSD1306.
     * `sha256`: Para la generación de checksums y entropía.
 
-* **Configuración IDE:** Exceptuando los parámetros mencionados arriba, el resto de las configuraciones del Arduino IDE pueden dejarse por defecto.
+**Configuración IDE:** Exceptuando los parámetros mencionados arriba, el resto de las configuraciones del Arduino IDE pueden dejarse por defecto.
 
 ## 🔌 Conexiones (Pinout)
 
 ### Cargar el software (ST-Link a BluePill)
-* Para cargar el codigo compilado utilizar un `ST-Link` conectado como se detalla
+
+Para cargar el codigo compilado utilizar un `ST-Link` conectado como se detalla
+
 | ST-Link | BluePill |
 | :--- | :--- |
 | 3.3V | 3V3 |
@@ -40,23 +42,23 @@ Para compilar, configura el Arduino IDE con los siguientes parámetros:
 * **DERECHA:** PA1
 * **IZQUIERDA:** PA2
 
-## 🧪 Ejemplos de Testeo
+## Ejemplos de Testeo
 
 Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba incluidos en el código:
 
 ### Test 1: Semilla de 12 palabras
-* **Seed:** `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`
-* **Fragmentos resultantes:**
-* 1. `blood dinner alcohol happy duty student bird repair design ripple endless certain`
-* 2. `conduct proof slot spike matrix cat earn common issue prosper narrow layer`
-* 3. `decrease must skate rice soap visa fatigue ocean estate bitter survey foot`
+**Seed:** `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`
+**Fragmentos resultantes:**
+1. `blood dinner alcohol happy duty student bird repair design ripple endless certain`
+2. `conduct proof slot spike matrix cat earn common issue prosper narrow layer`
+3. `decrease must skate rice soap visa fatigue ocean estate bitter survey foot`
 
 ### Test 2: Semilla de 24 palabras
-* **Seed:** `cook wire acid abuse truly evoke super head insect wedding lonely orchard nuclear damp song winter gossip blue vacant midnight order art glide mystery`
-* **Fragmentos resultantes:**
-* 1. `excuse question property more proud scrub recall rocket true peanut lemon tragic fall mixed tenant chief dutch predict mother prosper spatial another doll pass`
-* 2. `useful local bright brother ginger extra good merry final enlist digital garment buffalo early urban happy cave phone involve soap below man equip rough`
-* 3. `monster special ranch must chicken tell attitude food skull because screen celery sugar wire youth rebel affair bar biology unhappy flash logic hurdle movie`
+**Seed:** `cook wire acid abuse truly evoke super head insect wedding lonely orchard nuclear damp song winter gossip blue vacant midnight order art glide mystery`
+**Fragmentos resultantes:**
+1. `excuse question property more proud scrub recall rocket true peanut lemon tragic fall mixed tenant chief dutch predict mother prosper spatial another doll pass`
+2. `useful local bright brother ginger extra good merry final enlist digital garment buffalo early urban happy cave phone involve soap below man equip rough`
+3. `monster special ranch must chicken tell attitude food skull because screen celery sugar wire youth rebel affair bar biology unhappy flash logic hurdle movie`
 
 ## 🚀 Uso
 1. **Inicio:** Al encender el dispositivo, selecciona entre **[Split]** (dividir una semilla propia) o **Recover** (recuperar una semilla desde fragmentos).
