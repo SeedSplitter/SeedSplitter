@@ -1123,6 +1123,20 @@
             <p>Basado en el esquema de división de secretos de Shamir, matemáticamente demostrado y usado por empresas de seguridad en todo el mundo hace décadas.</p>
           </div>
         </div>
+        <div class="trust-item">
+          <div class="trust-icon">📂</div>
+          <div>
+            <h3>CÓDIGO 100% OPEN-SOURCE</h3>
+            <p>El firmware que corre el SeedSplitter es público y auditable. No tenés que confiar en nuestra palabra — podés leer cada línea del código vos mismo.</p>
+            <a href="https://github.com/SeedSplitter/SeedSplitter"
+               target="_blank"
+               style="display:inline-flex; align-items:center; gap:0.5rem; margin-top:1rem; color:var(--green); font-family:var(--mono); font-size:0.75rem; letter-spacing:1px; text-decoration:none; border-bottom:1px solid rgba(0,255,136,0.3); padding-bottom:2px; transition:border-color 0.2s;"
+               onmouseover="this.style.borderColor='var(--green)'"
+               onmouseout="this.style.borderColor='rgba(0,255,136,0.3)'">
+              ↗ github.com/SeedSplitter/SeedSplitter
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1297,6 +1311,24 @@
   <footer>
     <div class="logo">SEED SPLITTER</div>
     <p>PROTEGIENDO SOBERANÍAS · HECHO EN ARGENTINA</p>
+    <div style="margin-top:1.2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
+      <a href="https://github.com/SeedSplitter/SeedSplitter"
+         target="_blank"
+         style="font-family:var(--mono); font-size:0.75rem; color:var(--text-dim); text-decoration:none; letter-spacing:1px; transition:color 0.2s;"
+         onmouseover="this.style.color='var(--green)'"
+         onmouseout="this.style.color='var(--text-dim)'">
+        ↗ GitHub · Código abierto
+      </a>
+      <span style="color:#2a2a2a;">|</span>
+      <a href="https://x.com/SeedSplitterAr"
+         target="_blank"
+         style="font-family:var(--mono); font-size:0.75rem; color:var(--text-dim); text-decoration:none; letter-spacing:1px; transition:color 0.2s;"
+         onmouseover="this.style.color='var(--green)'"
+         onmouseout="this.style.color='var(--text-dim)'">
+        ✕ @SeedSplitterAr en X
+      </a>
+    </div>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </footer>
 
   <script>
@@ -1345,7 +1377,3 @@
         document.getElementById('progress').style.width = '23%';
       }, 500);
     });
-
-    // Smooth scroll for nav links
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click',
