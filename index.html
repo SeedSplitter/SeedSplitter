@@ -793,7 +793,7 @@
       .honeypot-grid { grid-template-columns: 1fr; }
       .scenario-steps { flex-direction: column; }
       .sc-arrow { transform: rotate(90deg); }
-  }
+    }
 
     /* BUY */
     .buy-section {
@@ -928,28 +928,46 @@
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
+      /* Estructuras base para que se adapten al ancho del celu */
+      .hero { padding: 6rem 1rem 3rem; }
       .hero-content { grid-template-columns: 1fr; gap: 2rem; }
       .hero-image { order: -1; }
-      .steps { grid-template-columns: 1fr; }
-      .trust-grid { grid-template-columns: 1fr; }
-      .cases-grid { grid-template-columns: 1fr; }
+      .stats-bar { padding: 1.5rem 1rem; }
       .stats-inner { flex-direction: column; gap: 1.5rem; }
-      .section { padding: 3rem 1.5rem; }
+      .steps { grid-template-columns: 1fr; }
+      .trust-section { padding: 3rem 1rem; }
+      .trust-grid { grid-template-columns: 1fr; }
+      .trust-item { padding: 1.5rem; }
+      .cases-grid { grid-template-columns: 1fr; }
+      .section { padding: 3rem 1rem; }
 
-      /* 1. Ajustes para el Menú Superior */
-      nav { padding: 1rem; }
-      .nav-logo span { display: none; } /* Oculta el subtítulo largo en el celu para dar espacio al botón */
-      .nav-cta { padding: 0.5rem 1rem; font-size: 0.8rem; }
+      /* 1. CORRECCIÓN DEL MENÚ: Muestra SEED SPLITTER completo y ajusta el botón */
+      nav { padding: 0.6rem 1rem; }
+      .nav-logo { font-size: 1rem; letter-spacing: 1px; }
+      .nav-logo span:last-child { display: none !important; } /* Oculta SOLO el subtítulo largo, manteniendo "SPLITTER" */
+      .nav-cta { padding: 0.5rem 0.8rem; font-size: 0.75rem; letter-spacing: 0.5px; }
 
-      /* 2. Ajustes para el Bloque de Precio/Contador del medio */
-      div:has(> .counter-box) { padding: 4rem 1rem !important; } /* Reduce el margen lateral externo */
-      .counter-box { grid-template-columns: 1fr; gap: 2rem; padding: 1.5rem; } /* Reduce padding interno de 3rem a 1.5rem */
-      .price-current { font-size: 2.8rem; } /* Achica el tamaño del texto del precio para que no desborde */
+      /* 2. CORRECCIÓN DEL PRECIO MEDIO: Evita que el contenedor inline rompa la pantalla */
+      div[style*="padding:4rem 2.5rem;"] { padding: 2rem 1rem !important; } 
+      .counter-box { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem 1rem; }
+      .price-current { font-size: 2.5rem; }
+      
+      /* 3. CORRECCIÓN DEL BANNER DE RECUPERACIÓN: Se ponía de lado en móviles y estiraba la web */
+      .recovery-banner { flex-direction: column; padding: 1.5rem 1rem; gap: 1rem; }
+      .recovery-banner a { font-size: 0.7rem; padding: 0.6rem 0.8rem; text-align: center; display: block; }
 
-      /* 3. Ajustes para la Sección de Compra de abajo */
-      .buy-section { padding: 4rem 1.5rem; }
+      /* 4. CORRECCIÓN DE LA SECCIÓN HONEYPOT Y ESCENARIOS */
+      .honeypot-section { padding: 3rem 1rem; }
+      .honeypot-grid { grid-template-columns: 1fr; }
+      .honeypot-scenario { padding: 1.5rem 1rem; }
+      .scenario-steps { flex-direction: column; gap: 1rem; }
+      .sc-arrow { transform: rotate(90deg); margin: 0.2rem 0; }
+
+      /* 5. SECCIÓN DE COMPRA INFERIOR */
+      .buy-section { padding: 4rem 1rem; }
       .buy-amount { font-size: 2.8rem; }
     }
+
 
   </style>
 </head>
