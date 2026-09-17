@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#080a09">
-  <title>SeedSplitter — Generá, dividí y protegé tu seed de Bitcoin offline</title>
-  <meta name="description" content="Hardware offline y open-source para Bitcoin. Generá una seed BIP39 con dados y exportá su zpub a una wallet watch-only sin cargar la seed en tu computadora, o dividí una seed existente en 3 backups recuperables con cualquier par.">
+  <title>SeedSplitter — Dividí y recuperá tu seed de Bitcoin | Backup 2-de-3 offline</title>
+  <meta name="description" content="Hardware offline y open-source para backup de seeds de Bitcoin. Dividí una seed BIP39 en 3 backups válidos y recuperala con cualquier par. Además, generá una seed con dados y exportá su zpub a una wallet watch-only.">
 
   <style>
     :root {
@@ -578,6 +578,128 @@
       color: var(--muted-2);
     }
 
+
+
+    .hero-secondary {
+      max-width: 760px;
+      margin: -8px 0 26px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    /* HONEYPOT */
+    .honeypot-section {
+      border-top: 1px solid rgba(247,147,26,.14);
+      border-bottom: 1px solid rgba(247,147,26,.14);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(247,147,26,.065), transparent 32%),
+        var(--bg-soft);
+    }
+
+    .honeypot-head strong { color: var(--text); }
+
+    .honeypot-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .honeypot-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .honeypot-card {
+      padding: 28px;
+      border: 1px solid rgba(247,147,26,.18);
+      background: var(--panel);
+    }
+
+    .honeypot-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100%;
+      background: linear-gradient(135deg, rgba(247,147,26,.07), transparent 55%), var(--panel);
+    }
+
+    .honeypot-label {
+      margin-bottom: 18px;
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .11em;
+    }
+
+    .honeypot-card h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.18;
+      letter-spacing: -.02em;
+    }
+
+    .honeypot-main h3 { font-size: clamp(28px, 3.4vw, 43px); }
+    .honeypot-card p { margin: 0; color: var(--muted); line-height: 1.72; }
+
+    .honeypot-note {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(247,147,26,.18);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .honeypot-scenario {
+      margin-top: 12px;
+      padding: 25px 28px;
+      border: 1px solid var(--line);
+      background: #090b0a;
+    }
+
+    .scenario-kicker {
+      margin-bottom: 18px;
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+
+    .scenario-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1.2fr;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .scenario-flow > div { display: flex; gap: 12px; align-items: flex-start; }
+    .scenario-flow strong {
+      flex: 0 0 27px;
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247,147,26,.4);
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .scenario-flow span { color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .scenario-flow i { color: var(--muted-2); font-style: normal; }
+    .scenario-alert strong { background: var(--orange); color: #10100d; border-color: var(--orange); }
+    .scenario-alert span { color: var(--text); }
+
+    .faq-subhead {
+      padding: 34px 0 10px;
+      border-bottom: 1px solid var(--line);
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+    }
+
     /* TESTS */
     .test-panel {
       display: grid;
@@ -741,6 +863,9 @@
       .steps-grid { grid-template-columns: 1fr 1fr; }
       .security-grid { grid-template-columns: 1fr 1fr; }
       .advanced { grid-template-columns: 1fr; gap: 22px; }
+      .honeypot-grid { grid-template-columns: 1fr; }
+      .scenario-flow { grid-template-columns: 1fr; }
+      .scenario-flow i { transform: rotate(90deg); justify-self: center; }
       .price-panel { grid-template-columns: 1fr; }
     }
 
@@ -779,9 +904,9 @@
       </a>
 
       <nav class="nav-links" aria-label="Navegación principal">
-        <a href="#que-hace">QUÉ HACE</a>
-        <a href="#watch-only">WATCH-ONLY</a>
-        <a href="#split">SPLIT / RECOVER</a>
+        <a href="#split">CÓMO FUNCIONA</a>
+        <a href="#honeypot">HONEYPOT</a>
+        <a href="#watch-only">GENERATE</a>
         <a href="#seguridad">SEGURIDAD</a>
         <a href="#faq">FAQ</a>
       </nav>
@@ -795,84 +920,129 @@
     <section class="hero">
       <div class="container hero-grid">
         <div>
-          <div class="eyebrow">HARDWARE OFFLINE · OPEN-SOURCE · BITCOIN</div>
-          <h1>Tu seed.<br><span class="green">Offline.</span><br>Bajo tu control.</h1>
+          <div class="eyebrow">BACKUP OFFLINE · OPEN-SOURCE · BITCOIN</div>
+          <h1>Tu seed.<br><span class="green">En tres partes.</span></h1>
           <p class="hero-lead">
-            Generá una seed de Bitcoin con <strong>entropía física de un dado</strong>, exportá únicamente su
-            <strong>zpub</strong> a una wallet watch-only y monitoreá tus fondos sin cargar la seed en el teléfono o la computadora.
-            También podés dividir una seed existente en <strong>3 backups BIP39</strong> recuperables con cualquier par.
+            SeedSplitter divide una seed BIP39 de 12 o 24 palabras en <strong>3 backups BIP39 reales y funcionales</strong>.
+            Guardalos por separado: <strong>cualquier combinación de 2 recupera tu seed original</strong>.
+          </p>
+          <p class="hero-secondary">
+            Además, puede generar una seed nueva con 50 tiradas de dado y mostrar su <strong>zpub BIP84 por QR</strong>, para crear una wallet watch-only sin cargar la seed en el teléfono o la computadora.
           </p>
           <div class="hero-actions">
-            <a href="#watch-only" class="btn btn-primary">VER GENERATE + WATCH-ONLY</a>
-            <a href="#split" class="btn btn-secondary">VER SPLIT / RECOVER</a>
+            <a href="#split" class="btn btn-primary">VER SPLIT / RECOVER</a>
+            <a href="#watch-only" class="btn btn-secondary">VER GENERATE + WATCH-ONLY</a>
           </div>
           <div class="hero-proof">
+            <span>1 seed → 3 backups</span>
+            <span>cualquier 2 → original</span>
             <span>sin Wi-Fi</span>
             <span>sin Bluetooth</span>
-            <span>12 / 24 palabras</span>
-            <span>código auditable</span>
           </div>
         </div>
 
         <div>
           <div class="product-shell">
-            <img src="foto-seedsplitter.png" alt="SeedSplitter, hardware offline para seeds de Bitcoin">
+            <img src="foto-seedsplitter.png" alt="SeedSplitter, hardware offline para backup de seeds de Bitcoin">
           </div>
           <div class="mode-strip" aria-label="Funciones principales">
             <div class="mode-chip"><strong>SPLIT</strong>1 seed → 3 backups</div>
             <div class="mode-chip"><strong>RECOVER</strong>2 backups → seed</div>
-            <div class="mode-chip generate"><strong>GENERATE</strong>50 dados → seed + zpub</div>
+            <div class="mode-chip generate"><strong>GENERATE</strong>dados → seed + zpub</div>
           </div>
         </div>
       </div>
     </section>
-
     <!-- WHAT IT DOES -->
     <section class="section" id="que-hace">
       <div class="container">
         <div class="section-head">
           <div>
-            <div class="section-tag">// DOS FORMAS DE USARLO</div>
-            <h2>Creá una wallet fría.<br>O protegé la que ya tenés.</h2>
+            <div class="section-tag">// PARA QUÉ EXISTE SEEDSPLITTER</div>
+            <h2>Un backup distribuido<br>sin formatos propietarios.</h2>
           </div>
           <p>
-            SeedSplitter concentra en un único dispositivo offline dos tareas distintas: generar una seed nueva sin depender de un RNG interno y crear un backup distribuido 2-de-3 de una seed existente.
+            La función central de SeedSplitter es transformar una única copia crítica en tres backups independientes. Cada parte es una frase BIP39 válida; no es un fragmento ilegible ni depende de conservar el dispositivo para siempre.
           </p>
         </div>
 
         <div class="use-cases">
           <article class="use-card primary">
             <div class="num">01</div>
-            <div class="kicker">GENERATE + WATCH-ONLY</div>
-            <h3>Generá tu seed y llevá sólo la zpub al mundo online.</h3>
+            <div class="kicker">SPLIT + RECOVER</div>
+            <h3>Una seed. Tres backups. Cualquier par recupera la original.</h3>
             <p>
-              Ingresás 50 tiradas de un dado físico. SeedSplitter genera una frase BIP39 de 12 o 24 palabras y, cuando querés, deriva localmente la cuenta BIP84 y muestra su zpub por QR.
+              Ingresás una seed BIP39 de 12 o 24 palabras. SeedSplitter genera tres frases BIP39 válidas y distintas, pensadas para guardarse en ubicaciones separadas.
             </p>
             <p>
-              La wallet watch-only puede generar direcciones y seguir saldo y transacciones sin recibir la seed ni las claves privadas necesarias para firmar.
+              Si una parte se pierde, se destruye o queda inaccesible, las otras dos siguen siendo suficientes para recuperar la seed original.
             </p>
             <div class="fact">
-              <span class="orange">50 tiradas → BIP39 → m/84'/0'/0' → zpub → watch-only</span>
+              <span class="green">1 seed → 3 backups · A+B, A+C o B+C → seed original</span>
             </div>
           </article>
 
           <article class="use-card">
             <div class="num">02</div>
-            <div class="kicker">SPLIT + RECOVER</div>
-            <h3>Convertí una sola copia crítica en un backup distribuido.</h3>
+            <div class="kicker">GENERATE · FUNCIÓN ADICIONAL</div>
+            <h3>También puede crear una seed nueva y su zpub watch-only.</h3>
             <p>
-              Ingresás tu seed BIP39 y SeedSplitter genera tres seed phrases válidas y distintas. Las guardás en lugares separados y cualquier combinación de dos permite reconstruir la original.
+              Ingresás 50 tiradas de un dado físico. SeedSplitter genera una frase BIP39 y puede derivar localmente la cuenta BIP84 <span class="mono">m/84'/0'/0'</span> para mostrar su zpub mediante QR.
             </p>
             <p>
-              Si el hardware deja de existir, la recuperación también puede hacerse con el script open-source <span class="mono">recover.py</span>.
+              Así podés monitorear y recibir Bitcoin desde una wallet watch-only sin cargar allí la seed ni las claves privadas.
             </p>
             <div class="fact">
-              <span class="green">1 seed → 3 backups · cualquier 2 → seed original</span>
+              <span class="orange">50 tiradas → BIP39 → zpub → watch-only</span>
             </div>
           </article>
         </div>
       </div>
     </section>
+    <!-- SPLIT -->
+    <section class="section" id="split">
+      <div class="container">
+        <div class="simple-head">
+          <div class="section-tag">// SPLIT + RECOVER</div>
+          <h2>De una seed a tres backups.</h2>
+          <p>
+            El objetivo es evitar que una única copia física sea un punto único de falla. SeedSplitter trabaja con frases BIP39 de 12 o 24 palabras.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step">
+            <div class="step-num">01 · INPUT</div>
+            <h3>Ingresás tu seed.</h3>
+            <p>La cargás palabra por palabra usando los tres botones del dispositivo. No hace falta conectarlo a una computadora.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">02 · SPLIT</div>
+            <h3>Obtiene tres frases BIP39.</h3>
+            <p>SeedSplitter muestra tres seed phrases válidas y distintas. Cada una puede interpretarse como una wallet BIP39 independiente.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">03 · DISTRIBUTE</div>
+            <h3>Las guardás por separado.</h3>
+            <p>Podés elegir ubicaciones y custodios diferentes para reducir el riesgo de pérdida, robo o destrucción de una única copia.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">04 · RECOVER</div>
+            <h3>Cualquier par recupera la original.</h3>
+            <p>Ingresás dos de las tres partes y SeedSplitter reconstruye la seed original de 12 o 24 palabras.</p>
+          </article>
+        </div>
+
+        <div class="recovery-strip">
+          <div>
+            <strong>La recuperación no depende de conservar el hardware.</strong>
+            <p>El repositorio incluye <span class="mono">recover.py</span> para reconstruir la seed original a partir de dos partes.</p>
+          </div>
+          <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO ↗</a>
+        </div>
+      </div>
+    </section>
+
 
     <!-- WATCH ONLY -->
     <section class="section alt" id="watch-only">
@@ -932,49 +1102,6 @@
       </div>
     </section>
 
-    <!-- SPLIT -->
-    <section class="section" id="split">
-      <div class="container">
-        <div class="simple-head">
-          <div class="section-tag">// SPLIT + RECOVER</div>
-          <h2>De una seed a tres backups.</h2>
-          <p>
-            El objetivo es evitar que una única copia física sea un punto único de falla. SeedSplitter trabaja con frases BIP39 de 12 o 24 palabras.
-          </p>
-        </div>
-
-        <div class="steps-grid">
-          <article class="step">
-            <div class="step-num">01 · INPUT</div>
-            <h3>Ingresás tu seed.</h3>
-            <p>La cargás palabra por palabra usando los tres botones del dispositivo. No hace falta conectarlo a una computadora.</p>
-          </article>
-          <article class="step">
-            <div class="step-num">02 · SPLIT</div>
-            <h3>Obtiene tres frases BIP39.</h3>
-            <p>SeedSplitter muestra tres seed phrases válidas y distintas. Cada una puede interpretarse como una wallet BIP39 independiente.</p>
-          </article>
-          <article class="step">
-            <div class="step-num">03 · DISTRIBUTE</div>
-            <h3>Las guardás por separado.</h3>
-            <p>Podés elegir ubicaciones y custodios diferentes para reducir el riesgo de pérdida, robo o destrucción de una única copia.</p>
-          </article>
-          <article class="step">
-            <div class="step-num">04 · RECOVER</div>
-            <h3>Cualquier par recupera la original.</h3>
-            <p>Ingresás dos de las tres partes y SeedSplitter reconstruye la seed original de 12 o 24 palabras.</p>
-          </article>
-        </div>
-
-        <div class="recovery-strip">
-          <div>
-            <strong>La recuperación no depende de conservar el hardware.</strong>
-            <p>El repositorio incluye <span class="mono">recover.py</span> para reconstruir la seed original a partir de dos partes.</p>
-          </div>
-          <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/recover.py" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER recover.py EN GITHUB ↗</a>
-        </div>
-      </div>
-    </section>
 
     <!-- SECURITY -->
     <section class="section alt" id="seguridad">
@@ -1024,29 +1151,62 @@
       </div>
     </section>
 
-    <!-- ADVANCED HONEYPOT -->
-    <section class="section">
+    <!-- HONEYPOT -->
+    <section class="section honeypot-section" id="honeypot">
       <div class="container">
-        <div class="advanced">
+        <div class="section-head honeypot-head">
           <div>
-            <div class="section-tag orange">// USO AVANZADO</div>
-            <h2>Las partes también son wallets BIP39 válidas.</h2>
+            <div class="section-tag orange">// HONEYPOT · UNA CONSECUENCIA ÚTIL DE SPLIT</div>
+            <h2>Cada parte es<br>una wallet real.</h2>
           </div>
-          <div>
+          <p>
+            Las tres partes que genera SeedSplitter son <strong>seed phrases BIP39 válidas y funcionales</strong>, no fragmentos cifrados. Eso permite usar opcionalmente una parte como wallet señuelo o canary y monitorear si ese backup fue comprometido.
+          </p>
+        </div>
+
+        <div class="honeypot-grid">
+          <article class="honeypot-card honeypot-main">
+            <div class="honeypot-label">HONEYPOT WALLET</div>
+            <h3>Un backup puede avisarte que alguien lo encontró.</h3>
             <p>
-              Las tres partes generadas por Split no son cadenas ilegibles: son frases BIP39 válidas. Eso permite, si querés, usar una parte como wallet señuelo o “canary”: asignarle una pequeña cantidad y monitorear sus direcciones para detectar si ese backup fue accedido.
+              Podés cargar una de las partes con una pequeña cantidad de Bitcoin y monitorear esa wallet. Si alguien encuentra el backup e intenta mover esos fondos, obtenés una señal de que esa parte fue comprometida y podés reorganizar tu esquema de custodia antes de que también se comprometa otra.
             </p>
-            <p>
-              <strong>Eso no convierte a la parte en la seed original.</strong> Una sola parte no alcanza para reconstruir la wallet protegida; para recuperar la seed original siguen haciendo falta dos de las tres partes.
-            </p>
-            <div class="advanced-note">
-              Esta es una estrategia opcional de monitoreo, no un reemplazo de una política de backups, privacidad y custodia bien diseñada.
-            </div>
+            <div class="honeypot-note">Una sola parte sigue sin alcanzar para reconstruir la seed original: para Recover hacen falta 2 de las 3.</div>
+          </article>
+
+          <div class="honeypot-stack">
+            <article class="honeypot-card">
+              <div class="honeypot-label">AMBIGÜEDAD</div>
+              <h3>Una frase BIP39 plausible.</h3>
+              <p>Quien encuentra una parte ve una seed phrase válida. No obtiene, por ese hecho, la seed original que SeedSplitter protege.</p>
+            </article>
+            <article class="honeypot-card">
+              <div class="honeypot-label">MONITOREO</div>
+              <h3>Podés vigilarla como cualquier wallet.</h3>
+              <p>Al ser una wallet BIP39 real, podés derivar sus direcciones y monitorearlas con una herramienta watch-only sin guardar la seed de esa parte en el dispositivo de consulta.</p>
+            </article>
+            <article class="honeypot-card">
+              <div class="honeypot-label">NO SON FRAGMENTOS</div>
+              <h3>Tres wallets válidas e independientes.</h3>
+              <p>Ésta es una propiedad importante del esquema de SeedSplitter: las partes tienen formato BIP39 estándar y además cualquier par permite recuperar la seed original.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="honeypot-scenario">
+          <div class="scenario-kicker">// EJEMPLO</div>
+          <div class="scenario-flow">
+            <div><strong>1</strong><span>Guardás la Parte A con una pequeña cantidad como anzuelo.</span></div>
+            <i>→</i>
+            <div><strong>2</strong><span>Alguien encuentra ese backup.</span></div>
+            <i>→</i>
+            <div><strong>3</strong><span>Mueve los fondos de la wallet señuelo.</span></div>
+            <i>→</i>
+            <div class="scenario-alert"><strong>!</strong><span>Detectás que la Parte A fue comprometida y reorganizás tus backups.</span></div>
           </div>
         </div>
       </div>
     </section>
-
     <!-- TESTS -->
     <section class="section alt" id="tests">
       <div class="container">
@@ -1058,8 +1218,7 @@
               El repositorio trae un procedimiento de test y un script que genera casos nuevos para Split y Generate. En Generate también calcula direcciones BIP84 para comprobar que la zpub importada en una wallet watch-only produce las direcciones esperadas.
             </p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;">
-              <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/TEST.md" target="_blank" rel="noopener" class="btn btn-secondary btn-small">LEER TEST.md ↗</a>
-              <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO ↗</a>
+              <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO Y TESTS ↗</a>
             </div>
           </div>
           <div class="code-box">$ python3 test.py
@@ -1102,96 +1261,106 @@ Watch-only — BIP84 addresses</div>
       <div class="container">
         <div class="simple-head">
           <div class="section-tag">// PREGUNTAS FRECUENTES</div>
-          <h2>Lo importante, sin letra chica.</h2>
+          <h2>Todo lo que<br>querés saber.</h2>
+          <p>Estas preguntas surgieron de consultas reales sobre SeedSplitter. Las mantenemos porque explican detalles prácticos que no entran en el resto de la página.</p>
         </div>
 
         <div class="faq">
           <details>
-            <summary>¿Qué es una zpub?</summary>
-            <div class="faq-answer">
-              Es una clave pública extendida para una cuenta Bitcoin Native SegWit. Permite derivar las direcciones públicas de esa cuenta y construir una wallet watch-only, pero no contiene las claves privadas necesarias para firmar transacciones.
-            </div>
+            <summary>¿Qué pasa si se rompe o pierdo el dispositivo?</summary>
+            <div class="faq-answer">No perdés nada. Con el software que brindamos, igual podés reconstruir tu clave original desde cualquier computadora usando 2 de las 3 partes. Sin el hardware, sin llamarnos, sin depender de nadie. El software y las instrucciones están publicados en <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">el repositorio del proyecto</a>.</div>
           </details>
 
           <details>
-            <summary>¿La zpub permite gastar mis bitcoins?</summary>
-            <div class="faq-answer">
-              No. La zpub sirve para observar y derivar direcciones, no para firmar. Sin embargo, sí revela información sobre las direcciones y actividad de esa cuenta, por lo que debe tratarse como información sensible desde el punto de vista de la privacidad.
-            </div>
+            <summary>¿Cómo sé que el dispositivo no guarda mi seed?</summary>
+            <div class="faq-answer">El firmware es open-source y el hardware está a la vista. La seed se procesa en RAM y el programa no la escribe en almacenamiento persistente. Podés auditar el código y verificar el comportamiento por tu cuenta.</div>
           </details>
 
           <details>
-            <summary>¿Qué derivation path usa la exportación watch-only?</summary>
-            <div class="faq-answer">
-              La implementación actual usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. La derivación BIP39 usa passphrase vacía.
-            </div>
+            <summary>¿Qué pasa si pierdo una de las 3 partes?</summary>
+            <div class="faq-answer">No pasa nada. El sistema requiere solo 2 de las 3 partes para reconstruir la clave original. Podés perder una parte sin perder el acceso a tus fondos.</div>
           </details>
 
           <details>
-            <summary>¿SeedSplitter soporta BIP39 passphrase en la exportación watch-only?</summary>
-            <div class="faq-answer">
-              La versión actual del firmware deriva la zpub con passphrase BIP39 vacía. La página no asume soporte para una passphrase adicional.
-            </div>
+            <summary>¿Funciona con cualquier wallet de Bitcoin?</summary>
+            <div class="faq-answer">Sí. SeedSplitter trabaja con seed phrases estándar BIP39 (12 o 24 palabras), que son compatibles con la gran mayoría de wallets: Electrum, Sparrow, Ledger, Trezor, y muchos más.</div>
           </details>
 
           <details>
-            <summary>¿Qué pasa si pierdo o rompo SeedSplitter?</summary>
-            <div class="faq-answer">
-              Si usaste Split, la recuperación de la seed original no depende del hardware: el repositorio incluye <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/recover.py" target="_blank" rel="noopener">recover.py</a>, que reconstruye la original a partir de dos de las tres partes.
-            </div>
+            <summary>¿Necesito conectarlo a una computadora?</summary>
+            <div class="faq-answer">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una batería portátil. No hay software que instalar ni computadora involucrada para usar Split, Recover o Generate. Si usás la función watch-only, la zpub se transfiere visualmente mediante un QR.</div>
           </details>
 
           <details>
-            <summary>¿Qué pasa si pierdo una de las tres partes?</summary>
-            <div class="faq-answer">
-              El esquema requiere cualquier combinación de dos partes para reconstruir la seed original. Perder una de las tres no impide la recuperación, siempre que las otras dos sigan disponibles.
-            </div>
+            <summary>¿Por qué el precio es tan bajo si protege tanto dinero?</summary>
+            <div class="faq-answer">Este es el precio de lanzamiento para las primeras 100 unidades. Queremos que la mayor cantidad de gente pueda acceder a esta protección. A partir de la segunda tanda, el precio sube a $60.000.</div>
+          </details>
+
+          <details>
+            <summary>¿Cuáles son los componentes principales del hardware?</summary>
+            <div class="faq-answer">Consiste en un microcontrolador STM32 (Blue Pill), una pantalla OLED 0.91 y una placa para botones y conexiones.</div>
+          </details>
+
+          <details>
+            <summary>¿Es posible auditar el hardware?</summary>
+            <div class="faq-answer">Sí, el dispositivo es completamente desmontable, permitiendo inspeccionar el STM32, la OLED y las conexiones de la placa.</div>
+          </details>
+
+          <details>
+            <summary>¿Es posible auditar el software?</summary>
+            <div class="faq-answer">Sí, el dispositivo es 100% open-source. Podés chequear <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">el repositorio</a>, compilar el firmware y subirlo a tu dispositivo.</div>
+          </details>
+
+          <details>
+            <summary>¿Cómo puedo comprobar que mi SeedSplitter funciona correctamente?</summary>
+            <div class="faq-answer">El repositorio incluye vectores de prueba para Split, Recover y Generate, tanto de 12 como de 24 palabras. Podés ingresar esos ejemplos en el dispositivo y comparar el resultado palabra por palabra. También incluimos un script que genera nuevos casos de prueba. Las seeds publicadas allí son exclusivamente para testing y nunca deben usarse para guardar fondos. Todo el material de verificación está disponible desde <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">el repositorio principal</a>.</div>
+          </details>
+
+          <details>
+            <summary>¿Es necesario reunir físicamente dos partes en el mismo lugar para recuperar mi clave?</summary>
+            <div class="faq-answer">No necesariamente. Podés usar una batería portátil (power bank) para mantener el dispositivo encendido mientras te trasladás. Cargás la Parte A en su ubicación geográfica, guardás el dispositivo encendido en tu mochila y, horas después, cargás la Parte B en su respectivo lugar. Al no apagar el SeedSplitter, la memoria volátil retiene la primera parte, permitiéndote reconstruir tu seed original sin que los dos respaldos físicos coincidan nunca en el mismo espacio-tiempo.</div>
+          </details>
+
+          <details>
+            <summary>¿Por qué 50 tiradas para 12 o 24 palabras?</summary>
+            <div class="faq-answer">Porque 50 tiradas alcanzan aproximadamente 128 bits de seguridad criptográfica. Las claves secp256k1 usadas por Bitcoin tienen un nivel de seguridad clásico de aproximadamente 128 bits frente a ataques genéricos, así que agregar más entropía a la seed no aumenta el nivel efectivo de seguridad de la clave frente a ese tipo de ataque. Con 50 tiradas obtenés ese nivel usando una fuente física de azar simple y verificable.</div>
           </details>
 
           <details>
             <summary>¿Las tres partes son seed phrases reales?</summary>
-            <div class="faq-answer">
-              Sí. El proyecto genera tres frases BIP39 válidas y distintas. Eso permite abrir cada parte como una wallet BIP39 independiente; una sola parte, sin embargo, no reconstruye la seed original protegida.
-            </div>
+            <div class="faq-answer">Sí. Split genera tres frases BIP39 válidas y distintas. Cada parte puede abrirse como una wallet BIP39 independiente; por eso también puede utilizarse opcionalmente como honeypot. Una sola parte, sin embargo, no permite reconstruir la seed original protegida.</div>
+          </details>
+
+          <div class="faq-subhead">GENERATE + WATCH-ONLY</div>
+
+          <details>
+            <summary>¿Qué es una zpub?</summary>
+            <div class="faq-answer">Es una clave pública extendida para una cuenta Bitcoin Native SegWit. Permite derivar las direcciones públicas de esa cuenta y construir una wallet watch-only, pero no contiene las claves privadas necesarias para firmar transacciones.</div>
           </details>
 
           <details>
-            <summary>¿Necesito conectar SeedSplitter a una computadora?</summary>
-            <div class="faq-answer">
-              No para usar Split, Recover o Generate. El dispositivo funciona de manera autónoma. Para watch-only, la transferencia de la zpub se hace visualmente mediante QR hacia una wallet compatible.
-            </div>
+            <summary>¿La zpub permite gastar mis bitcoins?</summary>
+            <div class="faq-answer">No. La zpub sirve para observar y derivar direcciones, no para firmar. Sin embargo, sí revela información sobre las direcciones y actividad de esa cuenta, por lo que debe tratarse como información sensible desde el punto de vista de la privacidad.</div>
           </details>
 
           <details>
-            <summary>¿Por qué 50 tiradas?</summary>
-            <div class="faq-answer">
-              Cincuenta resultados independientes de un dado de seis caras contienen aproximadamente 129 bits de entropía teórica (<code>50·log2(6)</code>). El firmware usa esa fuente física para construir la seed BIP39.
-            </div>
+            <summary>¿Qué derivation path usa la exportación watch-only?</summary>
+            <div class="faq-answer">La implementación actual usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. La derivación BIP39 usa passphrase vacía.</div>
           </details>
 
           <details>
-            <summary>¿Cómo verifico que mi unidad funciona correctamente?</summary>
-            <div class="faq-answer">
-              Usá los vectores publicados en <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/TEST.md" target="_blank" rel="noopener">TEST.md</a> y compará palabra por palabra y, para Generate, también las direcciones BIP84 derivadas desde la exportación watch-only. Las seeds de test nunca deben usarse para guardar fondos.
-            </div>
-          </details>
-
-          <details>
-            <summary>¿El código y el hardware se pueden auditar?</summary>
-            <div class="faq-answer">
-              El firmware y las herramientas auxiliares están publicados en GitHub. El dispositivo además deja visibles sus componentes principales —microcontrolador STM32, pantalla OLED y conexiones— para facilitar su inspección física.
-            </div>
+            <summary>¿SeedSplitter soporta BIP39 passphrase en la exportación watch-only?</summary>
+            <div class="faq-answer">La versión actual del firmware deriva la zpub con passphrase BIP39 vacía. La página no asume soporte para una passphrase adicional.</div>
           </details>
         </div>
       </div>
     </section>
-
     <!-- BUY -->
     <section class="buy" id="comprar">
       <div class="container">
         <div class="section-tag">// SEEDSPLITTER</div>
-        <h2>Generá. Protegé.<br><span class="green">Verificá.</span></h2>
-        <p>Hardware offline y open-source, hecho en Argentina.</p>
+        <h2>Dividí. Distribuí.<br><span class="green">Recuperá.</span></h2>
+        <p>Backup 2-de-3 offline y open-source para tu seed de Bitcoin. Hecho en Argentina.</p>
         <div class="buy-price">
           <span>PRECIO DE LANZAMIENTO</span>
           <strong>$20.000 ARS</strong>
