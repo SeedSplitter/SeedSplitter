@@ -66,6 +66,24 @@ Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba 
 2. `useful local bright brother ginger extra good merry final enlist digital garment buffalo early urban happy cave phone involve soap below man equip rough`
 3. `monster special ranch must chicken tell attitude food skull because screen celery sugar wire youth rebel affair bar biology unhappy flash logic hurdle movie`
 
+### Test 3: Generate con 50 tiradas iguales a 1
+
+Selecciona **Generate -> 12 words** e ingresa estas 50 tiradas:
+
+`11111111111111111111111111111111111111111111111111`
+
+**Seed esperada:**
+
+`diet glad hat rural panther lawsuit act drop gallery urge where fit`
+
+Después de importar el QR watch-only en una wallet BIP84 compatible, las tres primeras direcciones de recepción deben ser:
+
+1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
+2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
+3. `bc1qea22ynu5gdn8kxjxzlr3wcqhmyc4497pttca29`
+
+Este vector permite comprobar con un caso fijo tanto la generación BIP-39 a partir de los dados como la exportación watch-only BIP84.
+
 ## 🚀 Uso
 
 Al encender el dispositivo, el menú principal muestra las tres opciones disponibles: **Split**, **Recover** y **Generate**. Usa los botones **LEFT** y **RIGHT** para mover la selección y **ENTER** para confirmar.
@@ -115,6 +133,6 @@ El material privado intermedio se mantiene únicamente en RAM y se sobrescribe d
 ### ⚠️ Notas de Seguridad
 * **Entorno Offline:** Este software maneja claves privadas críticas. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet.
 * **Flash:** la Blue Pill probada reporta 128 KB físicos, pero el objetivo sigue siendo permanecer dentro del límite oficial/configurado de 64 KB.
-* **Prueba antes de usar fondos:** verifica primero el firmware con vectores conocidos y con una wallet sin fondos. El archivo `WATCHONLY_TEST.md` contiene un vector oficial BIP-84.
+* **Prueba antes de usar fondos:** verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
 

@@ -33,10 +33,10 @@ En cada prueba se muestra:
 - qué seed o tiradas ingresar;
 - qué resultado debería mostrar exactamente el dispositivo.
 
-En los tests de **Generate**, además de la frase BIP39, `test.py` calcula la
-`zpub` BIP84 y las primeras tres direcciones de recepción `bc1q...`. Después de
-escanear el QR watch-only con una wallet compatible, por ejemplo BlueWallet,
-esas tres direcciones deben coincidir exactamente.
+En los tests de **Generate**, además de la frase BIP39, `test.py` calcula las
+primeras tres direcciones de recepción BIP84 `bc1q...`. Después de escanear el
+QR watch-only con una wallet compatible, por ejemplo BlueWallet, esas tres
+direcciones deben coincidir exactamente.
 
 Compará el resultado del hardware palabra por palabra con el resultado mostrado
 por `test.py`.
@@ -49,9 +49,8 @@ Para los tests de **Split**, el script genera una seed BIP39 aleatoria y calcula
 las tres partes que SeedSplitter debería mostrar.
 
 Para los tests de **Generate**, genera 50 tiradas de dado de prueba, calcula la
-seed BIP39 que SeedSplitter debería mostrar y deriva de manera independiente la
-cuenta BIP84 `m/84'/0'/0'`, su `zpub` y las primeras tres direcciones externas
-`m/84'/0'/0'/0/0`, `/0/1` y `/0/2`.
+seed BIP39 que SeedSplitter debería mostrar y deriva de manera independiente las
+primeras tres direcciones externas BIP84: `m/84'/0'/0'/0/0`, `/0/1` y `/0/2`.
 
 Para comprobar **Recover**, pueden ingresarse dos de las tres shares producidas
 en un test de Split: la seed recuperada debe coincidir con la seed original de
