@@ -39,10 +39,10 @@ Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográ
 
 ## Tests reproducibles
 
-El repositorio incluye pruebas reproducibles para verificar `Split` y `Generate` en 12 y 24 palabras.
+El repositorio incluye pruebas reproducibles para verificar `Split`, `Generate` y la exportación watch-only en 12 y 24 palabras.
 
 - [`TEST.md`](TEST.md): explica cómo ejecutar las pruebas y comparar los resultados con el hardware.
-- [`test.py`](test.py): genera casos de prueba nuevos para `Split` y `Generate`.
+- [`test.py`](test.py): genera casos de prueba nuevos para `Split` y `Generate`, incluida la `zpub` y las primeras direcciones BIP84.
 
 ```bash
 python3 test.py

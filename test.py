@@ -2,8 +2,21 @@ import hashlib
 import secrets
 from mnemonic import Mnemonic
 from pyfinite import ffield
+from bip_utils import Bip39SeedGenerator, Bip84, Bip84Coins, Bip44Changes
 F = ffield.FField(8, gen=283, useLUT=0)
 mnemo = Mnemonic("english")
+
+
+def watch_only(seed_words):
+    seed_bytes = Bip39SeedGenerator(seed_words).Generate()
+    account = Bip84.FromSeed(seed_bytes, Bip84Coins.BITCOIN).Purpose().Coin().Account(0)
+    zpub = account.PublicKey().ToExtended()
+    external = account.Change(Bip44Changes.CHAIN_EXT)
+    addresses = [
+        external.AddressIndex(i).PublicKey().ToAddress()
+        for i in range(3)
+    ]
+    return zpub, addresses
 
 def split(seed_words):
     seed = bytes(mnemo.to_entropy(seed_words))
@@ -59,6 +72,13 @@ for number, words in enumerate((12, 24), 3):
     print("=" * 72)
     print(f"\nEn SeedSplitter elegí:\n  Generate -> {words} words")
     print(f"\nIngresá estas 50 tiradas, en este orden:\n\n{rolls}")
+    zpub, addresses = watch_only(seed)
+
     print(f"\nEl dispositivo debe mostrar exactamente esta seed:\n\n{seed}")
+    print(f"\nLa exportación watch-only debe corresponder a esta zpub:\n\n{zpub}")
+    print("\nDespués de importar el QR en una wallet BIP84 (por ejemplo BlueWallet),")
+    print("las primeras tres direcciones de recepción deben ser:")
+    for i, address in enumerate(addresses, 1):
+        print(f"  {i}. {address}")
 
 print("\n" + "=" * 72)

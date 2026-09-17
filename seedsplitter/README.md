@@ -95,15 +95,9 @@ Usa **Recover** para reconstruir una seed a partir de dos de las tres partes gen
 Usa **Generate** para crear una nueva seed a partir de **50 tiradas de un dado físico de seis caras**.
 
 1. Selecciona **Generate** y luego **12** o **24 palabras**.
-2. Tira un dado físico 50 veces.
-3. Para cada tirada, selecciona el valor **1–6** con **LEFT/RIGHT** y confirma con **ENTER**.
-4. Si necesitas corregir la tirada anterior, selecciona la opción `<`.
-5. Después de ingresar las 50 tiradas, SeedSplitter genera automáticamente una frase BIP-39 válida de 12 o 24 palabras y la muestra primero, sin mezclarla con la exportación pública.
-6. En **Generate**, usa **LEFT** para avanzar por las palabras y **RIGHT** para volver atrás.
-7. Desde la última palabra, pulsa **LEFT** una vez más. Sólo la primera vez aparece `BIP84 watch-only / Calculando zpub`; entonces deriva la cuenta Bitcoin Native SegWit **BIP-84** `m/84'/0'/0'` y construye su `zpub`.
-8. La pantalla muestra el QR animado a la izquierda y, a la derecha, `Watch-only` y `zpub nn/NN`. En BlueWallet usa **Add wallet → Import wallet → Scan** y mantén la cámara apuntando hasta que haya leído todos los frames.
-9. Pulsa **RIGHT** desde el QR para volver a la última palabra. Si vuelves a entrar con **LEFT**, el QR aparece directamente y la `zpub` no se recalcula.
-10. Anota la frase generada y guárdala de forma segura. La `zpub` es pública y regenerable; la frase BIP-39 es el backup importante y no debe compartirse.
+2. Tira un dado físico 50 veces. Para cada tirada, selecciona el valor **1–6** con **LEFT/RIGHT** y confirma con **ENTER**; usa `<` si necesitas corregir la tirada anterior.
+3. SeedSplitter genera y muestra la frase BIP-39. Usa **LEFT** para avanzar por las palabras y **RIGHT** para volver atrás. Anota la frase y guárdala de forma segura.
+4. Desde la última palabra, pulsa **LEFT** para acceder a la exportación watch-only por `zpub`. Pulsa **RIGHT** desde el QR para volver a las palabras. La `zpub` es pública y regenerable; la frase BIP-39 es el backup importante y no debe compartirse.
 
 ### Export watch-only
 
