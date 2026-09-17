@@ -37,37 +37,18 @@ Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográ
 
 ---
 
-## Verificación independiente
-
-El firmware hashea los valores del dado como caracteres ASCII, sin espacios ni saltos de línea.
-
-Por ejemplo, para una secuencia de prueba:
-
-```bash
-printf '123456123456...' | sha256sum
-```
-
-A partir del hash, SeedSplitter construye una frase BIP39 válida de **12 o 24 palabras** con su checksum estándar.
-
-No uses una secuencia publicada como seed real. La verificación debe hacerse offline.
-
----
-
-
 ## Tests reproducibles
 
-El repositorio incluye vectores públicos para verificar `Split`, `Recover` y
-`Generate` en 12 y 24 palabras.
+El repositorio incluye pruebas reproducibles para verificar `Split` y `Generate` en 12 y 24 palabras.
 
-- [`TEST_VECTORS.md`](TEST_VECTORS.md): ejemplos completos para ingresar en el hardware.
-- [`test_vectors.py`](test_vectors.py): reproduce el algoritmo del firmware, verifica los vectores oficiales y permite generar nuevos casos de prueba.
+- [`TEST.md`](TEST.md): explica cómo ejecutar las pruebas y comparar los resultados con el hardware.
+- [`test.py`](test.py): genera casos de prueba nuevos para `Split` y `Generate`.
 
 ```bash
-python3 test_vectors.py verify
+python3 test.py
 ```
 
-Las seeds y tiradas publicadas como vectores de prueba son conocidas por todo el
-mundo y **nunca deben usarse para guardar fondos**.
+Las seeds y tiradas generadas durante estas pruebas son sólo para testeo y **nunca deben usarse para guardar fondos**.
 
 ---
 
