@@ -132,7 +132,6 @@ El material privado intermedio se mantiene únicamente en RAM y se sobrescribe d
 
 ### ⚠️ Notas de Seguridad
 * **Entorno Offline:** Este software maneja claves privadas críticas. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet.
-* **Flash:** la Blue Pill probada reporta 128 KB físicos, pero el objetivo sigue siendo permanecer dentro del límite oficial/configurado de 64 KB.
 * **Prueba antes de usar fondos:** verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
 
