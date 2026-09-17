@@ -52,15 +52,25 @@ Las seeds y tiradas generadas durante estas pruebas son sólo para testeo y **nu
 
 ---
 
-## Recuperación sin el dispositivo
+## Scripts offline
 
-Si perdés el hardware, podés reconstruir tu seed original usando `recover.py` y cualquier computadora.
+El repositorio incluye tres scripts para usar las funciones principales desde una computadora. Sus dependencias pueden instalarse con:
 
 ```bash
-python recover.py
+pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 ```
 
-El script te va a pedir las 2 partes y devuelve la seed original. No requiere conexión a internet.
+- `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
+- `recover.py`: reconstruye la seed original a partir de 2 shares.
+- `generate.py`: genera una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo, y exporta la cuenta BIP84 watch-only como `zpub` y QR.
+
+```bash
+python3 split.py
+python3 recover.py
+python3 generate.py
+```
+
+Para trabajar con una seed real, se recomienda ejecutar estos scripts en un Live OS (como Tails o Ubuntu), desde un USB y en una PC air-gapped, sin conexión a internet.
 
 ---
 
