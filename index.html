@@ -1,1912 +1,1216 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SeedSplitter — Dividí y recuperá tu seed de Bitcoin</title>
-  <meta name="description" content="Hardware offline y open-source para dividir tu seed de Bitcoin en 3 partes BIP39 funcionales y recuperarla con cualquier par. También podés generar tu propia seed con dados.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080a09">
+  <title>SeedSplitter — Generá, dividí y protegé tu seed de Bitcoin offline</title>
+  <meta name="description" content="Hardware offline y open-source para Bitcoin. Generá una seed BIP39 con dados y exportá su zpub a una wallet watch-only sin cargar la seed en tu computadora, o dividí una seed existente en 3 backups recuperables con cualquier par.">
+
   <style>
     :root {
-      --black: #0a0a0a;
-      --green: #00ff88;
-      --green-dim: #00cc6a;
-      --green-dark: #003d1f;
-      --orange: #ff6b00;
-      --gray: #1a1a1a;
-      --gray2: #2a2a2a;
-      --text: #e8e8e8;
-      --text-dim: #888;
-      --mono: 'Share Tech Mono', monospace;
-      --sans: 'Barlow', sans-serif;
+      --bg: #080a09;
+      --bg-soft: #0d100e;
+      --panel: #111513;
+      --panel-2: #151a17;
+      --line: #252c28;
+      --line-soft: rgba(255,255,255,.07);
+      --text: #f0f3f1;
+      --muted: #a1aaa5;
+      --muted-2: #737d77;
+      --green: #32c47a;
+      --green-bright: #46d78b;
+      --green-dim: #1b6c45;
+      --green-wash: rgba(50,196,122,.09);
+      --orange: #f7931a;
+      --orange-wash: rgba(247,147,26,.08);
+      --danger: #e68a68;
+      --max: 1160px;
+      --radius: 3px;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-
     body {
-      background: var(--black);
+      margin: 0;
+      background: var(--bg);
       color: var(--text);
       font-family: var(--sans);
+      line-height: 1.55;
       overflow-x: hidden;
     }
 
-    /* NOISE TEXTURE OVERLAY */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.4;
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+    button, input, textarea, select { font: inherit; }
+
+    ::selection { background: rgba(50,196,122,.28); color: #fff; }
+
+    .container {
+      width: min(var(--max), calc(100% - 48px));
+      margin-inline: auto;
     }
+
+    .mono { font-family: var(--mono); }
+    .green { color: var(--green-bright); }
+    .orange { color: var(--orange); }
+    .muted { color: var(--muted); }
 
     /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line-soft);
+      background: rgba(8,10,9,.90);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-inner {
+      min-height: 70px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 1.2rem 2.5rem;
-      background: rgba(10,10,10,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(0,255,136,0.1);
+      gap: 28px;
     }
 
-    .nav-logo {
-      font-family: var(--mono);
-      font-size: 1.1rem;
-      color: var(--green);
-      letter-spacing: 2px;
-    }
-
-    .nav-logo span:last-child {
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      display: block;
-      letter-spacing: 3px;
-    }
-
-    .nav-cta {
-      background: var(--green);
-      color: var(--black);
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 0.6rem 1.4rem;
-      border: none;
-      cursor: pointer;
-      letter-spacing: 1px;
+    .brand {
       text-decoration: none;
-      transition: background 0.2s;
-    }
-
-    .nav-cta:hover { background: var(--green-dim); }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 11rem 2.5rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-grid {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-
-    .hero-glow {
-      position: absolute;
-      top: 20%;
-      right: -10%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(0,255,136,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-content {
-      position: relative;
-      max-width: 1100px;
-      margin: 0 auto;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-
-    .hero-badge {
       font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--green);
-      letter-spacing: 4px;
-      border: 1px solid rgba(0,255,136,0.3);
-      display: inline-block;
-      padding: 0.4rem 1rem;
-      margin-bottom: 1.5rem;
-      animation: fadeIn 0.5s ease forwards;
-    }
-
-    .hero h1 {
-      font-size: clamp(3rem, 6vw, 5.5rem);
-      font-weight: 900;
-      line-height: 0.95;
-      letter-spacing: -2px;
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    .hero h1 .split { color: var(--green); }
-
-    .hero-sub {
-      font-size: 1.2rem;
-      color: var(--text-dim);
-      font-weight: 300;
-      line-height: 1.6;
-      margin: 1.5rem 0 2.5rem;
-      animation: fadeUp 0.7s ease forwards;
-    }
-
-    .hero-sub strong { color: var(--text); font-weight: 600; }
-
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      animation: fadeUp 0.8s ease forwards;
-    }
-
-    .btn-primary {
-      background: var(--green);
-      color: var(--black);
-      font-family: var(--mono);
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 1rem 2rem;
-      border: none;
-      cursor: pointer;
-      letter-spacing: 1px;
-      text-decoration: none;
-      display: inline-block;
-      transition: all 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.15);
-      transform: translateX(-100%);
-      transition: transform 0.3s;
-    }
-
-    .btn-primary:hover::after { transform: translateX(0); }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 1rem;
-      padding: 1rem 2rem;
-      border: 1px solid var(--gray2);
-      cursor: pointer;
-      letter-spacing: 1px;
-      text-decoration: none;
-      display: inline-block;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    /* PRODUCT IMAGE */
-    .hero-image {
-      position: relative;
-      animation: fadeIn 1s ease forwards;
-    }
-
-    .product-frame {
-      position: relative;
-      background: var(--gray);
-      border: 1px solid rgba(0,255,136,0.2);
-      padding: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .product-frame::before {
-      content: 'GENERAR · DIVIDIR · RECUPERAR';
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--green);
-      color: var(--black);
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      letter-spacing: 3px;
-      padding: 2px 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
       white-space: nowrap;
     }
 
-    .product-frame img {
-      width: 100%;
-      max-width: 380px;
-      display: block;
-      filter: brightness(1.05) contrast(1.05);
-    }
+    .brand .seed { color: var(--text); }
+    .brand .splitter { color: var(--green-bright); }
 
-    /* REEMPLAZAR CON IMAGEN REAL */
-    .product-placeholder {
-      width: 100%;
-      max-width: 380px;
-      aspect-ratio: 4/3;
-      background: linear-gradient(135deg, #111 0%, #1a2a1a 50%, #111 100%);
-      border: 2px dashed rgba(0,255,136,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-family: var(--mono);
-      color: rgba(0,255,136,0.5);
-      font-size: 0.75rem;
-      letter-spacing: 2px;
-      text-align: center;
-    }
-
-    .product-placeholder .icon {
-      font-size: 2.5rem;
-      opacity: 0.4;
-    }
-
-    .corner {
-      position: absolute;
-      width: 16px; height: 16px;
-      border-color: var(--green);
-      border-style: solid;
-      opacity: 0.5;
-    }
-    .corner.tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
-    .corner.tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
-    .corner.bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
-    .corner.br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
-
-    .scan-line {
-      position: absolute;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--green), transparent);
-      opacity: 0.3;
-      animation: scan 3s linear infinite;
-    }
-
-    @keyframes scan {
-      0% { top: 0; }
-      100% { top: 100%; }
-    }
-
-    /* STATS */
-    .stats-bar {
-      background: var(--green-dark);
-      border-top: 1px solid rgba(0,255,136,0.2);
-      border-bottom: 1px solid rgba(0,255,136,0.2);
-      padding: 1.5rem 2.5rem;
-    }
-
-    .stats-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .stat-num {
-      font-family: var(--mono);
-      font-size: 1.8rem;
-      color: var(--green);
-      font-weight: 700;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      line-height: 1.4;
-      letter-spacing: 1px;
-    }
-
-    /* URGENCY BANNER */
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 8rem 2.5rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .counter-section {
-      padding: 4rem 2.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .counter-box {
-      background: var(--gray);
-      border: 1px solid rgba(0,255,136,0.15);
-      padding: 3rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      align-items: center;
-    }
-
-    .price-block { }
-
-    .price-label {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 4px;
-      color: var(--orange);
-      margin-bottom: 0.5rem;
-    }
-
-    .price-current {
-      font-size: 4rem;
-      font-weight: 900;
-      color: var(--green);
-      line-height: 1;
-      font-family: var(--mono);
-    }
-
-    .price-current span {
-      font-size: 1.5rem;
-      opacity: 0.7;
-    }
-
-    .price-next {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--text-dim);
-    }
-
-    .price-next s { color: var(--text-dim); }
-    .price-next strong { color: var(--text); }
-
-    .units-block { }
-
-    .units-label {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 4px;
-      color: var(--text-dim);
-      margin-bottom: 1rem;
-    }
-
-    .progress-bar {
-      height: 8px;
-      background: var(--gray2);
-      position: relative;
-      margin-bottom: 0.5rem;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--green);
-      width: 23%;
-      position: relative;
-      transition: width 1s ease;
-    }
-
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 4px;
-      background: white;
-      opacity: 0.8;
-    }
-
-    .units-count {
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      color: var(--text-dim);
-    }
-
-    .units-count strong { color: var(--green); font-size: 1.1rem; }
-
-    /* HOW IT WORKS */
-    .section {
-      padding: 5rem 2.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-tag {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 5px;
-      color: var(--green);
-      margin-bottom: 1rem;
-    }
-
-    .section h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 900;
-      line-height: 1.1;
-      letter-spacing: -1px;
-      margin-bottom: 3rem;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
-    }
-
-    .step {
-      background: var(--gray);
-      padding: 2.5rem 2rem;
-      border-top: 3px solid transparent;
-      transition: border-color 0.3s;
-      position: relative;
-    }
-
-    .step:hover { border-top-color: var(--green); }
-
-    .step-num {
-      font-family: var(--mono);
-      font-size: 3rem;
-      color: rgba(0,255,136,0.15);
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-
-    .step h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-      color: var(--text);
-    }
-
-    .step p {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    /* TRUST */
-    .trust-section {
-      background: var(--gray);
-      padding: 5rem 2.5rem;
-      border-top: 1px solid var(--gray2);
-      border-bottom: 1px solid var(--gray2);
-    }
-
-    .trust-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .trust-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
-      margin-top: 3rem;
-    }
-
-    .trust-item {
-      background: var(--black);
-      padding: 2.5rem;
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-    }
-
-    .trust-icon {
-      font-size: 2rem;
-      flex-shrink: 0;
-      width: 3rem;
-      text-align: center;
-    }
-
-    .trust-item h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: var(--green);
-      font-family: var(--mono);
-      letter-spacing: 1px;
-    }
-
-    .trust-item p {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    /* USE CASES */
-    .cases-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-top: 3rem;
-    }
-
-    .case-card {
-      background: var(--gray);
-      padding: 2rem;
-      border-left: 3px solid var(--green-dark);
-      transition: border-left-color 0.3s;
-    }
-
-    .case-card:hover { border-left-color: var(--green); }
-
-    .case-card h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-
-    .case-card p {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    /* FAQ */
-    .faq-list {
-      margin-top: 3rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .faq-item {
-      background: var(--gray);
-      border: none;
-      text-align: left;
-      width: 100%;
-      cursor: pointer;
-    }
-
-    .faq-q {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 2rem;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      gap: 1rem;
-    }
-
-    .faq-q .arrow {
-      font-family: var(--mono);
-      color: var(--green);
-      font-size: 1.2rem;
-      transition: transform 0.3s;
-      flex-shrink: 0;
-    }
-
-    details.faq-item { list-style: none; }
-    details.faq-item summary { list-style: none; }
-    details.faq-item summary::-webkit-details-marker { display: none; }
-
-    .faq-a {
-      padding: 1.5rem 2rem;
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.8;
-      border-top: 1px solid var(--gray2);
-    }
-
-    details[open] .arrow { transform: rotate(45deg); }
-
-    .recovery-banner {
-      margin-top: 2px;
-      background: linear-gradient(135deg, var(--green-dark) 0%, #001a0d 100%);
-      border: 1px solid rgba(0,255,136,0.25);
-      padding: 2rem 2.5rem;
-      display: flex;
-      gap: 1.5rem;
-      align-items: flex-start;
-    }
-
-    .rb-icon {
-      font-size: 2.5rem;
-      flex-shrink: 0;
-    }
-
-    .rb-title {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      letter-spacing: 3px;
-      color: var(--green);
-      margin-bottom: 0.6rem;
-    }
-
-    .recovery-banner p {
-      font-size: 0.95rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    .recovery-banner p strong { color: var(--text); }
-
-    /* HONEYPOT */
-    .honeypot-section {
-      background: linear-gradient(180deg, #0d0d0d 0%, #110800 50%, #0d0d0d 100%);
-      padding: 5rem 2.5rem;
-      border-top: 1px solid rgba(255,107,0,0.15);
-      border-bottom: 1px solid rgba(255,107,0,0.15);
-    }
-
-    .honeypot-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .honeypot-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 2px;
-      margin-bottom: 2px;
-    }
-
-    .honeypot-side {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .honeypot-card {
-      background: rgba(255,107,0,0.05);
-      border: 1px solid rgba(255,107,0,0.15);
-      padding: 2rem;
-      transition: border-color 0.3s;
-    }
-
-    .honeypot-card:hover { border-color: rgba(255,107,0,0.4); }
-
-    .main-card {
-      background: rgba(255,107,0,0.08);
-      border-color: rgba(255,107,0,0.3);
-    }
-
-    .hc-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .honeypot-card h3 {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      letter-spacing: 3px;
-      color: var(--orange);
-      margin-bottom: 0.75rem;
-    }
-
-    .honeypot-card p {
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    .hc-tag {
-      margin-top: 1.5rem;
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      letter-spacing: 2px;
-      color: rgba(255,107,0,0.5);
-      border-top: 1px solid rgba(255,107,0,0.15);
-      padding-top: 1rem;
-    }
-
-    .honeypot-scenario {
-      background: var(--gray);
-      border: 1px solid rgba(255,107,0,0.2);
-      padding: 2.5rem;
-      margin-top: 2px;
-    }
-
-    .scenario-label {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      letter-spacing: 4px;
-      color: var(--orange);
-      margin-bottom: 2rem;
-    }
-
-    .scenario-steps {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .sc-step {
-      flex: 1;
-      min-width: 150px;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-
-    .sc-num {
-      background: var(--gray2);
-      color: var(--green);
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-weight: 700;
-    }
-
-    .sc-step p {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      line-height: 1.5;
-    }
-
-    .sc-arrow {
-      font-family: var(--mono);
-      color: var(--text-dim);
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .sc-arrow.sc-alert { color: var(--orange); font-size: 1.5rem; }
-
-    .alert-step p { color: var(--text); }
-
-    /* BUY */
-    .buy-section {
-      background: linear-gradient(135deg, #0a1a0f 0%, var(--black) 50%, #0a1a0f 100%);
-      padding: 6rem 2.5rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .buy-section::before {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .buy-inner {
-      position: relative;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .buy-inner h2 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 900;
-      letter-spacing: -2px;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-
-    .buy-inner p {
-      color: var(--text-dim);
-      margin-bottom: 3rem;
-      font-size: 1.1rem;
-      line-height: 1.6;
-    }
-
-    .buy-price-big {
-      font-family: var(--mono);
-      font-size: 1rem;
-      color: var(--text-dim);
-      letter-spacing: 3px;
-      margin-bottom: 0.5rem;
-    }
-
-    .buy-amount {
-      font-family: var(--mono);
-      font-size: 3.5rem;
-      color: var(--green);
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .buy-note {
-      font-size: 0.8rem;
-      color: var(--orange);
-      font-family: var(--mono);
-      letter-spacing: 2px;
-      margin-bottom: 2.5rem;
-    }
-
-    .btn-buy {
-      background: var(--green);
-      color: var(--black);
-      font-family: var(--mono);
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 1.2rem 3rem;
-      border: none;
-      cursor: pointer;
-      letter-spacing: 2px;
-      display: inline-block;
-      text-decoration: none;
-      transition: all 0.2s;
-      width: 100%;
-      max-width: 360px;
-    }
-
-    .btn-buy:hover {
-      background: var(--green-dim);
-      transform: translateY(-2px);
-    }
-
-    .buy-contact {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      color: var(--text-dim);
-    }
-
-    .buy-contact a {
-      color: var(--green);
-      text-decoration: none;
-    }
-
-    /* FOOTER */
-    footer {
-      background: #050505;
-      padding: 2.5rem;
-      text-align: center;
-      border-top: 1px solid var(--gray2);
-    }
-
-    footer .logo {
-      font-family: var(--mono);
-      font-size: 1.2rem;
-      color: var(--green);
-      letter-spacing: 3px;
-      margin-bottom: 0.5rem;
-    }
-
-    footer p {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      letter-spacing: 2px;
-      font-family: var(--mono);
-    }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-        
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      /* 1. Reset global para matar el scroll horizontal */
-      body, html {
-        overflow-x: hidden !important;
-      }
-      
-      /* Ajuste de contenedores generales */
-      .hero { padding: 8rem 1rem 3rem; }
-      .section { padding: 3rem 1rem; }
-      .trust-section { padding: 3rem 1rem; }
-      .honeypot-section { padding: 3rem 1rem; }
-      .buy-section { padding: 4rem 1rem; }
-
-      /* 2. Barra de navegación fluida (Logo + Frase + Botón entran perfectos) */
-      nav { 
-        padding: 0.8rem 1rem; 
-        gap: 0.5rem;
-      }
-      .nav-logo { 
-        font-size: 1rem; 
-        letter-spacing: 1px;
-        line-height: 1.2;
-      }
-      .nav-logo span:last-child { 
-        font-size: 0.55rem; 
-        letter-spacing: 1px; 
-        margin-top: 2px;
-      }
-      .nav-cta { 
-        padding: 0.5rem 0.8rem; 
-        font-size: 0.75rem; 
-        white-space: nowrap;
-      }
-
-      /* 3. Bloque del Precio de Lanzamiento (Evita el desborde en pantallas chicas) */
-      div[style*="padding:4rem 2.5rem;"] { 
-        padding: 2rem 1rem !important; 
-      }
-      .counter-box { 
-        grid-template-columns: 1fr; 
-        gap: 2rem; 
-        padding: 1.5rem !important; 
-      }
-      .price-current { 
-        font-size: 2.5rem !important; /* Achica el $20.000 para que no empuje la pantalla */
-      }
-      .price-current span {
-        font-size: 1.2rem;
-      }
-
-      /* 4. Botón de GitHub (Fuerza al texto largo inline a acomodarse en dos renglones) */
-      .recovery-banner {
-        flex-direction: column;
-        padding: 1.5rem;
-        gap: 1rem;
-      }
-      .recovery-banner a[href*="recover.py"] {
-        display: block !important;
-        width: 100% !important;
-        text-align: center;
-        font-size: 0.75rem !important;
-        padding: 0.8rem 0.5rem !important;
-        white-space: normal !important; 
-      }
-
-      /* 5. Grillas adaptadas a una sola columna */
-      .hero-content { grid-template-columns: 1fr; gap: 2rem; }
-      .hero-image { order: -1; }
-      .steps { grid-template-columns: 1fr; }
-      .trust-grid { grid-template-columns: 1fr !important; gap: 2px; }
-      .trust-item { padding: 1.5rem 1.2rem !important; word-break: break-word;}
-      .cases-grid { grid-template-columns: 1fr; }
-      .stats-inner { flex-direction: column; gap: 1.5rem; }
-      
-      /* Honeypot interactivo */
-      .honeypot-grid { grid-template-columns: 1fr; }
-      .scenario-steps { flex-direction: column; gap: 1rem; text-align: center; }
-      .sc-step { width: 100%; justify-content: center; }
-      .sc-arrow { transform: rotate(90deg); margin: 0.5rem 0; }
-
-      /* 6. Bloque de compra final (Alineado y centrado) */
-      .buy-amount { font-size: 2.8rem; }
-      .btn-buy { width: 100%; max-width: 100%; padding: 1.2rem; font-size: 1rem; }
-    }
-
-
-    /* NAV LINKS */
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.6rem;
+      gap: 22px;
       margin-left: auto;
-      margin-right: 1.5rem;
     }
 
     .nav-links a {
-      color: var(--text-dim);
+      color: var(--muted);
       text-decoration: none;
       font-family: var(--mono);
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      transition: color 0.2s;
+      font-size: 12px;
+      letter-spacing: .06em;
     }
 
-    .nav-links a:hover { color: var(--green); }
+    .nav-links a:hover { color: var(--text); }
 
-    /* HERO PRODUCT NOTE */
-    .hero-product-note {
-      margin-top: 1rem;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-    }
-
-    .hero-product-note div {
-      background: rgba(0,255,136,0.055);
-      border: 1px solid rgba(0,255,136,0.12);
-      padding: 0.75rem 0.5rem;
-      text-align: center;
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      text-decoration: none;
       font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--text-dim);
-      letter-spacing: 1px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .025em;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
     }
 
-    .hero-product-note strong {
-      display: block;
-      color: var(--green);
-      font-size: 0.78rem;
-      margin-bottom: 0.2rem;
-    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--green); color: #061008; }
+    .btn-primary:hover { background: var(--green-bright); }
+    .btn-secondary { border-color: var(--line); color: var(--text); background: rgba(255,255,255,.015); }
+    .btn-secondary:hover { border-color: #455049; background: rgba(255,255,255,.03); }
+    .btn-small { min-height: 40px; padding-inline: 15px; font-size: 12px; }
 
-    /* THREE MODES */
-    .modes-section {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 5rem 2.5rem 2rem;
-    }
-
-    .modes-section h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -1px;
-      margin-bottom: 1.5rem;
-    }
-
-    .modes-intro {
-      max-width: 720px;
-      color: var(--text-dim);
-      font-size: 1.05rem;
-      line-height: 1.75;
-      margin-top: 0;
-      margin-bottom: 2.5rem;
-    }
-
-    .modes-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-    }
-
-    .mode-card {
+    /* HERO */
+    .hero {
       position: relative;
-      background: var(--gray);
-      border: 1px solid rgba(255,255,255,0.035);
-      padding: 2.4rem 2rem 2.1rem;
-      min-height: 340px;
+      padding: 92px 0 72px;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(50,196,122,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(50,196,122,.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), transparent 88%);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(50,196,122,.10), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.03fr .97fr;
+      gap: 72px;
+      align-items: center;
+    }
+
+    .eyebrow,
+    .section-tag {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      color: var(--green-bright);
+      font-size: 12px;
+      letter-spacing: .14em;
+      font-weight: 800;
+    }
+
+    .eyebrow { margin-bottom: 20px; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 24px;
+      font-size: clamp(48px, 7vw, 82px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      font-weight: 850;
+    }
+
+    .hero-lead {
+      max-width: 690px;
+      color: var(--muted);
+      font-size: clamp(17px, 1.7vw, 21px);
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .hero-lead strong { color: var(--text); font-weight: 650; }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .hero-proof {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin-top: 26px;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .hero-proof span::before {
+      content: "•";
+      color: var(--green-bright);
+      margin-right: 7px;
+    }
+
+    .product-shell {
+      position: relative;
+      background: linear-gradient(180deg, #131815, #0d100e);
+      border: 1px solid var(--line);
+      padding: 24px;
+      box-shadow: 0 26px 70px rgba(0,0,0,.30);
+    }
+
+    .product-shell::before {
+      content: "SEEDSPLITTER · OPEN HARDWARE";
+      display: block;
+      margin-bottom: 18px;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+    }
+
+    .product-shell img {
+      width: 100%;
+      max-height: 430px;
+      object-fit: contain;
+      filter: contrast(1.03) brightness(1.03);
+    }
+
+    .mode-strip {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1px;
+      margin-top: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-top: 0;
+    }
+
+    .mode-chip {
+      background: var(--bg-soft);
+      padding: 13px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .mode-chip strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text);
+      font-size: 11px;
+      letter-spacing: .04em;
+    }
+
+    .mode-chip.generate strong { color: var(--orange); }
+
+    /* SECTION BASE */
+    .section { padding: 92px 0; }
+    .section.alt { background: var(--bg-soft); border-block: 1px solid var(--line-soft); }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 60px;
+      align-items: end;
+      margin-bottom: 48px;
+    }
+
+    .section-head h2,
+    .simple-head h2 {
+      margin: 10px 0 0;
+      font-size: clamp(34px, 4.6vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -.045em;
+    }
+
+    .section-head p,
+    .simple-head p {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+
+    .simple-head { max-width: 760px; margin-bottom: 42px; }
+
+    /* PRIMARY USE CASES */
+    .use-cases {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .use-card {
+      position: relative;
+      min-height: 420px;
+      padding: 34px;
+      background: var(--panel);
+      border: 1px solid var(--line);
       overflow: hidden;
     }
 
-    .mode-card.featured {
-      background:
-        linear-gradient(180deg, rgba(0,255,136,0.07), transparent 70%),
-        var(--gray);
-      border-color: rgba(0,255,136,0.26);
+    .use-card.primary {
+      background: linear-gradient(180deg, var(--green-wash), transparent 58%), var(--panel);
+      border-color: rgba(50,196,122,.28);
     }
 
-    .mode-kicker {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--green);
-      letter-spacing: 3px;
-      margin-bottom: 1.4rem;
-    }
-
-    .mode-num {
+    .use-card .num {
       position: absolute;
-      top: 0.8rem;
-      right: 1rem;
+      right: 24px;
+      top: 18px;
       font-family: var(--mono);
-      font-size: 4.5rem;
+      font-size: 70px;
+      font-weight: 900;
+      color: rgba(255,255,255,.035);
       line-height: 1;
-      font-weight: 700;
-      color: rgba(0,255,136,0.06);
     }
 
-    .mode-card h3 {
-      font-size: 1.65rem;
-      line-height: 1.05;
-      margin-bottom: 1rem;
+    .use-card .kicker {
+      color: var(--green-bright);
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 24px;
     }
 
-    .mode-card p {
-      color: var(--text-dim);
+    .use-card.primary .kicker { color: var(--orange); }
+
+    .use-card h3 {
+      max-width: 520px;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+      margin-bottom: 18px;
+    }
+
+    .use-card p { color: var(--muted); max-width: 560px; line-height: 1.72; }
+
+    .use-card .fact {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      color: var(--text);
+      font-size: 12px;
       line-height: 1.7;
-      font-size: 0.94rem;
     }
 
-    .mode-fact {
-      margin-top: 1.5rem;
-      padding-top: 1.2rem;
-      border-top: 1px solid var(--gray2);
-      font-family: var(--mono);
-      color: var(--text);
-      font-size: 0.75rem;
-      line-height: 1.55;
-    }
-
-    .mode-fact strong { color: var(--green); }
-
-    /* DICE / ENTROPY FEATURE */
-    .entropy-section {
-      background:
-        radial-gradient(circle at 82% 35%, rgba(0,255,136,0.09), transparent 26%),
-        var(--gray);
-      border-top: 1px solid var(--gray2);
-      border-bottom: 1px solid var(--gray2);
-      padding: 5rem 2.5rem;
-    }
-
-    .entropy-inner {
-      max-width: 1100px;
-      margin: 0 auto;
+    /* WATCH ONLY */
+    .watch-layout {
       display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 4rem;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 52px;
       align-items: center;
     }
 
-    .entropy-copy h2 {
-      font-size: clamp(2.2rem, 4vw, 3.5rem);
-      line-height: 1.03;
-      letter-spacing: -1px;
-      margin-bottom: 1.5rem;
+    .watch-copy h2 {
+      font-size: clamp(40px, 5.2vw, 66px);
+      line-height: 1.00;
+      letter-spacing: -.05em;
+      margin: 12px 0 24px;
     }
 
-    .entropy-copy > p {
-      color: var(--text-dim);
-      font-size: 1.02rem;
-      line-height: 1.75;
-      max-width: 650px;
-    }
+    .watch-copy > p { color: var(--muted); font-size: 17px; line-height: 1.75; }
 
-    .entropy-equation {
-      margin: 2rem 0 1.2rem;
-      padding: 1.15rem 1.25rem;
-      background: var(--black);
-      border-left: 3px solid var(--green);
-      font-family: var(--mono);
-      font-size: clamp(1rem, 2vw, 1.35rem);
-      color: var(--green);
-    }
-
-    .entropy-note {
-      color: var(--text-dim);
-      font-size: 0.82rem;
-      line-height: 1.65;
-    }
-
-    .dice-panel {
-      border: 1px solid rgba(0,255,136,0.2);
-      background: rgba(10,10,10,0.65);
-      padding: 1.6rem;
-      position: relative;
-    }
-
-    .dice-panel::before {
-      content: '50 TIRADAS';
-      position: absolute;
-      top: -11px;
-      left: 1.2rem;
-      background: var(--green);
-      color: var(--black);
-      padding: 2px 9px;
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-    }
-
-    .dice-grid {
+    .flow {
+      margin: 34px 0 26px;
       display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 6px;
-      margin-bottom: 1.5rem;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 8px;
+      align-items: stretch;
     }
 
-    .die {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(0,255,136,0.16);
-      background: rgba(0,255,136,0.035);
-      color: rgba(0,255,136,0.55);
-      font-family: var(--mono);
-      font-size: 0.65rem;
-    }
-
-    .entropy-flow {
+    .flow-box {
+      min-height: 82px;
       display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      gap: 0.7rem;
-      align-items: center;
+      place-items: center;
+      padding: 12px 8px;
+      border: 1px solid var(--line);
+      background: var(--bg);
       font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
       text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
     }
 
-    .entropy-flow .box {
-      border: 1px solid var(--gray2);
-      padding: 0.7rem 0.5rem;
-      background: var(--black);
-    }
+    .flow-box strong { color: var(--text); font-size: 11px; }
+    .flow-box.bitcoin { border-color: rgba(247,147,26,.36); background: var(--orange-wash); }
+    .flow-box.bitcoin strong { color: var(--orange); }
+    .flow-arrow { align-self: center; color: var(--green-bright); font-family: var(--mono); }
 
-    .entropy-flow .arrow {
-      color: var(--green);
-      font-size: 1rem;
-    }
-
-    .entropy-flow strong {
-      display: block;
-      color: var(--text);
-      margin-bottom: 0.15rem;
-    }
-
-    /* TECHNICAL CALLOUT */
-    .technical-note {
-      max-width: 1100px;
-      margin: 0 auto 4rem;
-      padding: 0 2.5rem;
-    }
-
-    .technical-note-inner {
-      border: 1px solid rgba(255,107,0,0.28);
-      background: rgba(255,107,0,0.045);
-      padding: 1.25rem 1.5rem;
-      font-size: 0.83rem;
+    .watch-note {
+      border-left: 2px solid var(--green);
+      background: rgba(50,196,122,.055);
+      padding: 16px 18px;
+      color: var(--muted);
+      font-size: 14px;
       line-height: 1.65;
-      color: var(--text-dim);
     }
 
-    .technical-note-inner strong {
+    .watch-note strong { color: var(--text); }
+
+    .device-map {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 26px;
+    }
+
+    .device-map-title {
+      font-family: var(--mono);
+      color: var(--muted-2);
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .device-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 18px;
+      padding: 22px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .device-row:first-of-type { border-top: 0; }
+
+    .device-name {
+      font-family: var(--mono);
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .device-name.offline { color: var(--green-bright); }
+    .device-name.online { color: var(--orange); }
+
+    .device-data { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .device-data strong { color: var(--text); }
+
+    .technical-line {
+      margin-top: 22px;
+      padding: 15px 16px;
+      background: #090b0a;
+      border: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .technical-line .orange { color: var(--orange); }
+
+    /* SPLIT / RECOVER */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 1px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .step {
+      min-height: 300px;
+      background: var(--panel);
+      padding: 28px 24px;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      color: var(--green-bright);
+      font-size: 12px;
+      letter-spacing: .12em;
+      margin-bottom: 48px;
+    }
+
+    .step h3 { font-size: 21px; line-height: 1.22; margin-bottom: 14px; }
+    .step p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    .recovery-strip {
+      display: flex;
+      gap: 28px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 24px 26px;
+      border: 1px solid rgba(50,196,122,.24);
+      background: rgba(50,196,122,.055);
+    }
+
+    .recovery-strip strong { display: block; margin-bottom: 5px; }
+    .recovery-strip p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    /* SECURITY */
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+    }
+
+    .security-card {
+      padding: 28px;
+      min-height: 220px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+
+    .security-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 24px;
+      border: 1px solid rgba(50,196,122,.4);
+      color: var(--green-bright);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .security-card h3 {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: .03em;
+      margin-bottom: 12px;
+    }
+
+    .security-card p { color: var(--muted); font-size: 14px; line-height: 1.7; margin: 0; }
+
+    /* ADVANCED */
+    .advanced {
+      display: grid;
+      grid-template-columns: .75fr 1.25fr;
+      gap: 48px;
+      align-items: start;
+      padding: 36px;
+      border: 1px solid rgba(247,147,26,.22);
+      background: linear-gradient(100deg, var(--orange-wash), transparent 55%), var(--panel);
+    }
+
+    .advanced h2 {
+      margin: 10px 0 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+
+    .advanced p { color: var(--muted); line-height: 1.75; }
+    .advanced strong { color: var(--text); }
+
+    .advanced-note {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--muted-2);
+    }
+
+    /* TESTS */
+    .test-panel {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 20px;
+      padding: 34px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .test-panel h3 { font-size: 30px; line-height: 1.1; letter-spacing: -.03em; }
+    .test-panel p { color: var(--muted); line-height: 1.72; }
+
+    .code-box {
+      padding: 20px;
+      background: #070908;
+      border: 1px solid var(--line);
+      font-family: var(--mono);
+      color: var(--green-bright);
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+
+    /* PRICE */
+    .price-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .price-side {
+      padding: 38px;
+      background: var(--panel);
+    }
+
+    .price-kicker {
       color: var(--orange);
       font-family: var(--mono);
-      letter-spacing: 1px;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
 
-    @media (max-width: 900px) {
+    .price {
+      font-size: clamp(46px, 6vw, 72px);
+      line-height: 1;
+      letter-spacing: -.05em;
+      font-weight: 850;
+      margin-bottom: 12px;
+    }
+
+    .price small { font-size: 16px; color: var(--muted); letter-spacing: 0; }
+    .price-side p { color: var(--muted); }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .progress {
+      height: 8px;
+      background: #080a09;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress > div { height: 100%; width: 23%; background: var(--green); }
+
+    /* FAQ */
+    .faq { border-top: 1px solid var(--line); }
+    details { border-bottom: 1px solid var(--line); }
+    summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 23px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      align-items: center;
+      font-weight: 650;
+    }
+    summary::-webkit-details-marker { display:none; }
+    summary::after {
+      content: "+";
+      color: var(--green-bright);
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 400;
+    }
+    details[open] summary::after { content: "−"; }
+    .faq-answer {
+      max-width: 900px;
+      padding: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 15px;
+    }
+    .faq-answer code { color: var(--orange); font-family: var(--mono); }
+    .faq-answer a { color: var(--green-bright); }
+
+    /* BUY */
+    .buy {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid var(--line-soft);
+      background:
+        radial-gradient(circle at 50% 100%, rgba(50,196,122,.12), transparent 43%),
+        var(--bg-soft);
+    }
+
+    .buy h2 {
+      font-size: clamp(44px, 6vw, 76px);
+      line-height: 1;
+      letter-spacing: -.05em;
+      margin: 14px 0 18px;
+    }
+
+    .buy > .container > p { color: var(--muted); font-size: 17px; }
+    .buy-price { font-family: var(--mono); margin: 30px 0 20px; }
+    .buy-price strong { display:block; font-family: var(--sans); font-size: 44px; letter-spacing: -.04em; }
+    .buy-price span { color: var(--muted); font-size: 11px; letter-spacing: .08em; }
+    .contact { margin-top: 18px; color: var(--muted-2); font-size: 13px; }
+    .contact a { color: var(--muted); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--line); padding: 32px 0 40px; }
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      color: var(--muted-2);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .footer-links { display:flex; gap:18px; flex-wrap:wrap; }
+    .footer-links a { color: var(--muted); text-decoration:none; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* RESPONSIVE */
+    @media (max-width: 980px) {
       .nav-links { display: none; }
-      .modes-grid { grid-template-columns: 1fr; }
-      .mode-card { min-height: auto; }
-      .entropy-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero-grid,
+      .watch-layout,
+      .section-head,
+      .test-panel { grid-template-columns: 1fr; }
+      .hero-grid { gap: 46px; }
+      .product-shell { max-width: 650px; }
+      .section-head { gap: 20px; align-items: start; }
+      .use-cases { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .security-grid { grid-template-columns: 1fr 1fr; }
+      .advanced { grid-template-columns: 1fr; gap: 22px; }
+      .price-panel { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 768px) {
-      .hero-product-note { grid-template-columns: 1fr; }
-      .modes-section { padding: 4rem 1rem 2rem; }
-      .entropy-section { padding: 4rem 1rem; }
-      .technical-note { padding: 0 1rem; }
-      .dice-grid { gap: 4px; }
-      .entropy-flow {
-        grid-template-columns: 1fr;
-      }
-      .entropy-flow .arrow { transform: rotate(90deg); }
+    @media (max-width: 680px) {
+      .container { width: min(var(--max), calc(100% - 30px)); }
+      .nav-inner { min-height: 62px; }
+      .brand { font-size: 14px; }
+      .site-nav .btn { min-height: 38px; padding: 0 11px; font-size: 10px; margin-left: auto; }
+      .hero { padding: 66px 0 52px; }
+      h1 { font-size: clamp(44px, 15vw, 68px); }
+      .section { padding: 70px 0; }
+      .hero-actions .btn { width: 100%; }
+      .mode-strip { grid-template-columns: 1fr; }
+      .use-card { min-height: unset; padding: 26px 22px; }
+      .flow { grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); text-align:center; }
+      .device-row { grid-template-columns: 1fr; gap: 6px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .security-grid { grid-template-columns: 1fr; }
+      .recovery-strip { flex-direction: column; align-items: flex-start; }
+      .recovery-strip .btn { width: 100%; }
+      .advanced, .test-panel, .price-side { padding: 25px 22px; }
+      .price { font-size: 48px; }
+      .buy { padding: 72px 0; }
+      .buy .btn { width: 100%; }
+      summary { padding: 20px 0; }
     }
-
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-logo">
-      SEED<span style="color:var(--green)">SPLITTER</span>
-      <span>PROTEGIENDO SOBERANÍAS</span>
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top" aria-label="SeedSplitter">
+        <span class="seed">SEED</span><span class="splitter">SPLITTER</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#que-hace">QUÉ HACE</a>
+        <a href="#watch-only">WATCH-ONLY</a>
+        <a href="#split">SPLIT / RECOVER</a>
+        <a href="#seguridad">SEGURIDAD</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+
+      <a href="#comprar" class="btn btn-primary btn-small">COMPRAR</a>
     </div>
-    <div class="nav-links" aria-label="Navegación principal">
-      <a href="#funciones">CÓMO FUNCIONA</a>
-      <a href="#seguridad">SEGURIDAD</a>
-      <a href="#entropia">GENERATE</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <a href="#comprar" class="nav-cta">COMPRAR AHORA</a>
-  </nav>
+  </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-grid"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="hero-text">
-        <div class="hero-badge">HARDWARE · OFFLINE · OPEN-SOURCE</div>
-        <h1>
-          TU SEED.<br>
-          EN TRES<br>
-          <span class="split">PARTES.</span>
-        </h1>
-        <p class="hero-sub">
-          SeedSplitter te permite hacer un <strong>backup distribuido de tu seed de Bitcoin</strong>:
-          la divide en 3 seed phrases BIP39 válidas y funcionales, y cualquier par permite recuperar la original.
-          Todo offline, open-source y bajo tu control.
-        </p>
-        <div class="hero-actions">
-          <a href="#comprar" class="btn-primary">QUIERO UNO — $20.000</a>
-          <a href="#funciones" class="btn-secondary">VER CÓMO FUNCIONA</a>
-        </div>
-      </div>
-
-      <div class="hero-image">
-        <div class="product-frame">
-          <div class="corner tl"></div>
-          <div class="corner tr"></div>
-          <div class="corner bl"></div>
-          <div class="corner br"></div>
-          <div class="scan-line"></div>
-          <img src="foto-seedsplitter.png" alt="SeedSplitter, hardware offline para seeds de Bitcoin">
-        </div>
-        <div class="hero-product-note">
-          <div><strong>SPLIT</strong>1 seed → 3 partes</div>
-          <div><strong>RECOVER</strong>2 partes → seed</div>
-          <div><strong>GENERATE</strong>50 dados → BIP39</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div class="stats-bar">
-    <div class="stats-inner">
-      <div class="stat">
-        <div class="stat-num">3</div>
-        <div class="stat-label">PARTES BIP39<br>FUNCIONALES</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">2/3</div>
-        <div class="stat-label">PARA RECUPERAR<br>LA ORIGINAL</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">12/24</div>
-        <div class="stat-label">PALABRAS<br>BIP39</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">50</div>
-        <div class="stat-label">TIRADAS PARA<br>GENERAR TU SEED</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- THREE MODES -->
-  <section class="modes-section" id="funciones">
-    <div class="section-tag">// BACKUP DISTRIBUIDO DE TU SEED</div>
-    <h2>Dividí. Guardá.<br>Recuperá.</h2>
-    <p class="modes-intro">
-      La función principal de SeedSplitter es proteger tu seed mediante un backup 2 de 3:
-      la divide en tres seed phrases válidas y cualquier par permite reconstruir la original.
-      Además, si querés crear tu propia seed desde cero, también podés generarla con dados.
-    </p>
-
-    <div class="modes-grid">
-      <article class="mode-card featured">
-        <div class="mode-num">01</div>
-        <div class="mode-kicker">SPLIT</div>
-        <h3>Dividí tu seed en 3.</h3>
-        <p>
-          Ingresás tu seed de 12 o 24 palabras y SeedSplitter genera 3 seed phrases BIP39 válidas y funcionales.
-          Podés guardarlas en lugares distintos y evitar depender de una única copia.
-        </p>
-        <div class="mode-fact">
-          <strong>1 seed → 3 backups</strong><br>
-          Cualquier par permite reconstruir la original.
-        </div>
-      </article>
-
-      <article class="mode-card">
-        <div class="mode-num">02</div>
-        <div class="mode-kicker">RECOVER</div>
-        <h3>Recuperá con 2 de 3.</h3>
-        <p>
-          Ingresás dos de las tres partes y SeedSplitter reconstruye la seed original.
-          Si perdés el dispositivo, también podés recuperarla con el software open-source del proyecto.
-        </p>
-        <div class="mode-fact">
-          <strong>2 partes alcanzan</strong><br>
-          El hardware no es una dependencia.
-        </div>
-      </article>
-
-      <article class="mode-card">
-        <div class="mode-num">03</div>
-        <div class="mode-kicker">GENERATE</div>
-        <h3>Generá tu propia seed.</h3>
-        <p>
-          Si preferís crear tu clave desde cero, podés hacerlo con 50 tiradas de un dado físico.
-          SeedSplitter convierte esa secuencia en una seed BIP39 válida de 12 o 24 palabras.
-        </p>
-        <div class="mode-fact">
-          <strong>50 tiradas → ~128 bits de seguridad</strong><br>
-          Tu propio azar, procesado offline.
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- COUNTER / PRECIO -->
-  <div style="max-width:1100px; margin:0 auto; padding:4rem 2.5rem;">
-    <div class="counter-box">
-      <div class="price-block">
-        <div class="price-label">// PRECIO DE LANZAMIENTO</div>
-        <div class="price-current"><span>$</span>20.000 <span style="font-size:1rem;color:var(--text-dim)">ARS</span></div>
-        <div class="price-next" style="margin-top:0.75rem;">
-          Próxima tanda (500 unidades): <strong>$60.000 ARS</strong>
-        </div>
-        <div style="margin-top:1.5rem;">
-          <a href="#comprar" class="btn-primary" style="font-size:0.9rem; padding:0.8rem 1.5rem;">
-            ASEGURAR MI UNIDAD →
-          </a>
-        </div>
-      </div>
-      <div class="units-block">
-        <div class="units-label">// DISPONIBILIDAD — PRIMERA TANDA</div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress"></div>
-        </div>
-        <div class="units-count">
-          <strong id="sold">23</strong> / 100 unidades vendidas
-        </div>
-        <div style="margin-top:1rem; font-size:0.8rem; color:var(--text-dim); line-height:1.6;">
-          Una vez agotadas las 100 unidades,<br>
-          el siguiente lote sale a <span style="color:var(--orange);">$60.000</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ENTROPY -->
-  <section class="entropy-section" id="entropia">
-    <div class="entropy-inner">
-      <div class="entropy-copy">
-        <div class="section-tag">// FUNCIÓN ADICIONAL · GENERATE</div>
-        <h2>¿Querés crear<br>tu propia seed?</h2>
-        <p>
-          En el modo <strong style="color:var(--text)">Generate</strong>, podés crear una seed desde cero usando un dado físico como fuente de azar.
-          Ingresás 50 tiradas y SeedSplitter genera localmente una frase BIP39 de 12 o 24 palabras.
-        </p>
-        <div class="entropy-equation">50 TIRADAS → ~128 BITS DE SEGURIDAD</div>
-        <p class="entropy-note">
-          Con un dado razonablemente justo y tiradas independientes y secretas, el método está diseñado para alcanzar ~128 bits de seguridad criptográfica. Podés generar una seed BIP39 de 12 o 24 palabras.
-        </p>
-      </div>
-
-      <div class="dice-panel" aria-label="Representación de 50 tiradas de dados">
-        <div class="dice-grid">
-          <div class="die">01</div>
-          <div class="die">02</div>
-          <div class="die">03</div>
-          <div class="die">04</div>
-          <div class="die">05</div>
-          <div class="die">06</div>
-          <div class="die">07</div>
-          <div class="die">08</div>
-          <div class="die">09</div>
-          <div class="die">10</div>
-          <div class="die">11</div>
-          <div class="die">12</div>
-          <div class="die">13</div>
-          <div class="die">14</div>
-          <div class="die">15</div>
-          <div class="die">16</div>
-          <div class="die">17</div>
-          <div class="die">18</div>
-          <div class="die">19</div>
-          <div class="die">20</div>
-          <div class="die">21</div>
-          <div class="die">22</div>
-          <div class="die">23</div>
-          <div class="die">24</div>
-          <div class="die">25</div>
-          <div class="die">26</div>
-          <div class="die">27</div>
-          <div class="die">28</div>
-          <div class="die">29</div>
-          <div class="die">30</div>
-          <div class="die">31</div>
-          <div class="die">32</div>
-          <div class="die">33</div>
-          <div class="die">34</div>
-          <div class="die">35</div>
-          <div class="die">36</div>
-          <div class="die">37</div>
-          <div class="die">38</div>
-          <div class="die">39</div>
-          <div class="die">40</div>
-          <div class="die">41</div>
-          <div class="die">42</div>
-          <div class="die">43</div>
-          <div class="die">44</div>
-          <div class="die">45</div>
-          <div class="die">46</div>
-          <div class="die">47</div>
-          <div class="die">48</div>
-          <div class="die">49</div>
-          <div class="die">50</div>
-        </div>
-        <div class="entropy-flow">
-          <div class="box"><strong>50 dados</strong>1–6</div>
-          <div class="arrow">→</div>
-          <div class="box"><strong>SHA-256</strong>local</div>
-          <div class="arrow">→</div>
-          <div class="box"><strong>BIP39</strong>12 / 24 palabras</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- HOW IT WORKS -->
-  <section class="section" id="como-funciona">
-    <div class="section-tag">// DIVIDIR UNA SEED EXISTENTE</div>
-    <h2>De una seed<br>a tres respaldos.</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <h3>Ingresás tu seed phrase</h3>
-        <p>Usando los 3 botones del dispositivo, ingresás las palabras de tu clave. Todo ocurre localmente, sin salir del hardware.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <h3>Genera 3 seed phrases válidas</h3>
-        <p>No son fragmentos inútiles — son wallets reales y funcionales. Cada parte puede abrirse en cualquier wallet compatible con BIP39. Necesitás 2 de las 3 para reconstruir la original.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <h3>Guardás cada parte en un lugar distinto</h3>
-        <p>En casa, en el banco, en el trabajo, con un familiar de confianza. Ninguna parte sirve sola. Tu Bitcoin queda protegido.</p>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <h3>Recuperás con cualquier par</h3>
-        <p>Dos de las tres partes reconstruyen la seed original. Y si perdés el dispositivo, podés usar el software open-source del proyecto.</p>
-      </div>
-    </div>
-
-    <div class="recovery-banner">
-      <div class="rb-icon">🛡️</div>
-      <div style="flex:1;">
-        <div class="rb-title">TU CLAVE NO DEPENDE DEL HARDWARE</div>
-        <p>El dispositivo es una herramienta, no una dependencia. Si se rompe, se pierde o lo destruís adrede, igual podés recuperar tu Bitcoin usando solo las 2 partes y el software disponible. Sin el dispositivo. Sin nosotros. Sin intermediarios.</p>
-        <div style="margin-top:1.2rem; display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
-          <a href="https://github.com/seedsplitter/seedsplitter/blob/main/recover.py"
-             target="_blank"
-             style="display:inline-flex; align-items:center; gap:0.5rem; background:var(--green); color:var(--black); font-family:var(--mono); font-size:0.8rem; font-weight:700; padding:0.6rem 1.2rem; text-decoration:none; letter-spacing:1px;">
-            ⬇ DESCARGAR SCRIPT DE RECUPERACIÓN
-          </a>
-          <span style="font-family:var(--mono); font-size:0.7rem; color:var(--text-dim); letter-spacing:1px;">
-            Código abierto · Auditalo vos mismo en GitHub
-          </span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUST -->
-  <section class="trust-section" id="seguridad">
-    <div class="trust-inner">
-      <div class="section-tag">// POR QUÉ CONFIAR</div>
-      <h2 style="font-size: clamp(2rem, 4vw, 3rem); font-weight:900; letter-spacing:-1px; line-height:1.1; margin-bottom:0;">
-        Lo que ves<br>es todo lo que hay.
-      </h2>
-      <div class="trust-grid">
-        <div class="trust-item">
-          <div class="trust-icon">📡</div>
-          <div>
-            <h3>SIN WIFI NI BLUETOOTH</h3>
-            <p>El diseño no incorpora radios Wi‑Fi ni Bluetooth. La operación de SeedSplitter ocurre localmente y el hardware queda a la vista para que puedas inspeccionarlo.</p>
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">HARDWARE OFFLINE · OPEN-SOURCE · BITCOIN</div>
+          <h1>Tu seed.<br><span class="green">Offline.</span><br>Bajo tu control.</h1>
+          <p class="hero-lead">
+            Generá una seed de Bitcoin con <strong>entropía física de un dado</strong>, exportá únicamente su
+            <strong>zpub</strong> a una wallet watch-only y monitoreá tus fondos sin cargar la seed en el teléfono o la computadora.
+            También podés dividir una seed existente en <strong>3 backups BIP39</strong> recuperables con cualquier par.
+          </p>
+          <div class="hero-actions">
+            <a href="#watch-only" class="btn btn-primary">VER GENERATE + WATCH-ONLY</a>
+            <a href="#split" class="btn btn-secondary">VER SPLIT / RECOVER</a>
+          </div>
+          <div class="hero-proof">
+            <span>sin Wi-Fi</span>
+            <span>sin Bluetooth</span>
+            <span>12 / 24 palabras</span>
+            <span>código auditable</span>
           </div>
         </div>
-        <div class="trust-item">
-          <div class="trust-icon">💾</div>
-          <div>
-            <h3>NO GUARDA TU SEED</h3>
-            <p>La seed y las tiradas se procesan en memoria de trabajo y el firmware no las escribe en almacenamiento persistente. Al apagar el dispositivo, esos datos de sesión desaparecen.</p>
+
+        <div>
+          <div class="product-shell">
+            <img src="foto-seedsplitter.png" alt="SeedSplitter, hardware offline para seeds de Bitcoin">
           </div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">🔬</div>
-          <div>
-            <h3>HARDWARE 100% VISIBLE</h3>
-            <p>No hay carcasa que oculte nada. Podés ver cada componente del circuito. Esta transparencia no es un defecto — es la mayor garantía de seguridad que podemos darte.</p>
-          </div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">🔐</div>
-          <div>
-            <h3>DIVISIÓN 2 DE 3</h3>
-            <p>El esquema permite reconstruir la seed original con cualquier par de las tres partes generadas. Las partes son frases BIP39 válidas, no fragmentos ilegibles.</p>
-          </div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">📂</div>
-          <div>
-            <h3>CÓDIGO 100% OPEN-SOURCE</h3>
-            <p>El firmware que corre el SeedSplitter es público y auditable. No tenés que confiar en nuestra palabra — podés leer cada línea del código vos mismo.</p>
-            <a href="https://github.com/SeedSplitter/SeedSplitter"
-               target="_blank"
-               style="display:inline-flex; align-items:center; gap:0.5rem; margin-top:1rem; color:var(--green); font-family:var(--mono); font-size:0.75rem; letter-spacing:1px; text-decoration:none; border-bottom:1px solid rgba(0,255,136,0.3); padding-bottom:2px; transition:border-color 0.2s;"
-               onmouseover="this.style.borderColor='var(--green)'"
-               onmouseout="this.style.borderColor='rgba(0,255,136,0.3)'">
-              ↗ github.com/SeedSplitter/SeedSplitter
-            </a>
-          </div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-icon">🎲</div>
-          <div>
-            <h3>ENTROPÍA FÍSICA</h3>
-            <p>Para crear una seed nueva, podés aportar vos mismo el azar con 50 tiradas de un dado. La secuencia se procesa localmente y nunca necesita salir del dispositivo.</p>
+          <div class="mode-strip" aria-label="Funciones principales">
+            <div class="mode-chip"><strong>SPLIT</strong>1 seed → 3 backups</div>
+            <div class="mode-chip"><strong>RECOVER</strong>2 backups → seed</div>
+            <div class="mode-chip generate"><strong>GENERATE</strong>50 dados → seed + zpub</div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- HONEYPOT SECTION -->
-  <section class="honeypot-section">
-    <div class="honeypot-inner">
-      <div class="section-tag" style="color:var(--orange);">// FEATURE EXCLUSIVA</div>
-      <h2 style="font-size:clamp(2rem,4vw,3.2rem); font-weight:900; letter-spacing:-1px; line-height:1.1; margin-bottom:1rem;">
-        Cada parte es<br><span style="color:var(--orange);">una trampa.</span>
-      </h2>
-      <p style="color:var(--text-dim); font-size:1.1rem; line-height:1.7; max-width:600px; margin-bottom:3.5rem;">
-        Las 3 partes que genera SeedSplitter son <strong style="color:var(--text)">seed phrases 100% válidas y funcionales</strong> — no fragmentos cifrados. Podés abrirlas en cualquier wallet. Y eso te da un superpoder que ninguna otra solución tiene.
-      </p>
-
-      <div class="honeypot-grid">
-        <div class="honeypot-card main-card">
-          <div class="hc-icon">🍯</div>
-          <h3>HONEYPOT WALLET</h3>
+    <!-- WHAT IT DOES -->
+    <section class="section" id="que-hace">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-tag">// DOS FORMAS DE USARLO</div>
+            <h2>Creá una wallet fría.<br>O protegé la que ya tenés.</h2>
+          </div>
           <p>
-            Cargá cada parte con una pequeña cantidad de Bitcoin — $5, $10, lo que quieras.
-            Si alguien encuentra una parte y mueve esos fondos,
-            <strong>te enterás al instante</strong> que fue comprometida.
+            SeedSplitter concentra en un único dispositivo offline dos tareas distintas: generar una seed nueva sin depender de un RNG interno y crear un backup distribuido 2-de-3 de una seed existente.
           </p>
-          <p style="margin-top:1rem;">
-            Es seguridad activa. No esperás a descubrir el robo cuando ya es tarde — el ladrón te avisa él solo.
+        </div>
+
+        <div class="use-cases">
+          <article class="use-card primary">
+            <div class="num">01</div>
+            <div class="kicker">GENERATE + WATCH-ONLY</div>
+            <h3>Generá tu seed y llevá sólo la zpub al mundo online.</h3>
+            <p>
+              Ingresás 50 tiradas de un dado físico. SeedSplitter genera una frase BIP39 de 12 o 24 palabras y, cuando querés, deriva localmente la cuenta BIP84 y muestra su zpub por QR.
+            </p>
+            <p>
+              La wallet watch-only puede generar direcciones y seguir saldo y transacciones sin recibir la seed ni las claves privadas necesarias para firmar.
+            </p>
+            <div class="fact">
+              <span class="orange">50 tiradas → BIP39 → m/84'/0'/0' → zpub → watch-only</span>
+            </div>
+          </article>
+
+          <article class="use-card">
+            <div class="num">02</div>
+            <div class="kicker">SPLIT + RECOVER</div>
+            <h3>Convertí una sola copia crítica en un backup distribuido.</h3>
+            <p>
+              Ingresás tu seed BIP39 y SeedSplitter genera tres seed phrases válidas y distintas. Las guardás en lugares separados y cualquier combinación de dos permite reconstruir la original.
+            </p>
+            <p>
+              Si el hardware deja de existir, la recuperación también puede hacerse con el script open-source <span class="mono">recover.py</span>.
+            </p>
+            <div class="fact">
+              <span class="green">1 seed → 3 backups · cualquier 2 → seed original</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- WATCH ONLY -->
+    <section class="section alt" id="watch-only">
+      <div class="container watch-layout">
+        <div class="watch-copy">
+          <div class="section-tag">// GENERATE · SEED + ZPUB</div>
+          <h2>Monitoreá Bitcoin sin cargar tu seed en una computadora.</h2>
+          <p>
+            El flujo de Generate empieza con una fuente física de azar: 50 tiradas independientes de un dado de seis caras. La frase BIP39 se genera localmente en SeedSplitter. Después de anotarla, podés pedir la exportación watch-only.
           </p>
-          <div class="hc-tag">CANARY WALLET · TÉCNICA USADA EN CIBERSEGURIDAD EMPRESARIAL</div>
-        </div>
 
-        <div class="honeypot-side">
-          <div class="honeypot-card">
-            <div class="hc-icon">🎭</div>
-            <h3>IMPOSIBLE DE DISTINGUIR</h3>
-            <p>Quien encuentra una parte no sabe si es la "real", una de las 3, o directamente una trampa. La ambigüedad es parte de la seguridad.</p>
+          <div class="flow" aria-label="Flujo Generate y watch-only">
+            <div class="flow-box"><strong>50 DADOS</strong>entropía física</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box"><strong>SEED BIP39</strong>12 / 24 palabras</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box bitcoin"><strong>ZPUB BIP84</strong>información pública</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box bitcoin"><strong>WATCH-ONLY</strong>recibir + mirar</div>
           </div>
-          <div class="honeypot-card">
-            <div class="hc-icon">📡</div>
-            <h3>ALERTA INMEDIATA</h3>
-            <p>Configurá cualquier wallet watcher para monitorear las direcciones honeypot. Si se mueven fondos, tu seed fue descubierta.</p>
-          </div>
-          <div class="honeypot-card">
-            <div class="hc-icon">🔑</div>
-            <h3>WALLETS REALES, NO FRAGMENTOS</h3>
-            <p>A diferencia de otros esquemas, las partes de SeedSplitter son wallets BIP39 válidas. Compatibles con Electrum, Sparrow, Ledger y más.</p>
+
+          <div class="watch-note">
+            <strong>La computadora o el teléfono que usás para monitorear la wallet no necesita recibir la seed.</strong>
+            La zpub no permite firmar ni gastar, pero sí permite derivar y observar las direcciones de esa cuenta; por privacidad, no conviene publicarla ni compartirla indiscriminadamente.
           </div>
         </div>
-      </div>
 
-      <div class="honeypot-scenario">
-        <div class="scenario-label">// ESCENARIO REAL</div>
-        <div class="scenario-steps">
-          <div class="sc-step">
-            <span class="sc-num">1</span>
-            <p>Guardás la Parte A en tu casa con <strong>0.0001 BTC</strong> como anzuelo</p>
+        <aside class="device-map" aria-label="Qué información ve cada dispositivo">
+          <div class="device-map-title">Qué ve cada parte del sistema</div>
+
+          <div class="device-row">
+            <div class="device-name offline">SEEDSPLITTER</div>
+            <div class="device-data">
+              Procesa la <strong>seed</strong> y el material privado de derivación localmente. El firmware construye la zpub y sobrescribe después el material privado intermedio.
+            </div>
           </div>
-          <div class="sc-arrow">→</div>
-          <div class="sc-step">
-            <span class="sc-num">2</span>
-            <p>Alguien entra a tu casa y encuentra el papel</p>
+
+          <div class="device-row">
+            <div class="device-name">BACKUP</div>
+            <div class="device-data">
+              Tu frase de <strong>12 o 24 palabras</strong>, guardada por vos en el soporte que elijas. Es el dato crítico que permite recuperar las claves.
+            </div>
           </div>
-          <div class="sc-arrow">→</div>
-          <div class="sc-step">
-            <span class="sc-num">3</span>
-            <p>Mueve el Bitcoin del anzuelo</p>
+
+          <div class="device-row">
+            <div class="device-name online">WATCH-ONLY</div>
+            <div class="device-data">
+              Recibe la <strong>zpub</strong>. Puede derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas para firmar.
+            </div>
           </div>
-          <div class="sc-arrow sc-alert">→</div>
-          <div class="sc-step alert-step">
-            <span class="sc-num" style="background:var(--orange);">!</span>
-            <p><strong style="color:var(--orange);">Recibís la alerta.</strong> Sabés que la Parte A fue comprometida. Reorganizás antes de que lleguen a las otras.</p>
+
+          <div class="technical-line">
+            BIP39 → PBKDF2-HMAC-SHA512 → BIP32 → <span class="orange">m/84'/0'/0'</span> → zpub<br>
+            Bitcoin mainnet · cuenta 0 · passphrase BIP39 vacía
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SPLIT -->
+    <section class="section" id="split">
+      <div class="container">
+        <div class="simple-head">
+          <div class="section-tag">// SPLIT + RECOVER</div>
+          <h2>De una seed a tres backups.</h2>
+          <p>
+            El objetivo es evitar que una única copia física sea un punto único de falla. SeedSplitter trabaja con frases BIP39 de 12 o 24 palabras.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step">
+            <div class="step-num">01 · INPUT</div>
+            <h3>Ingresás tu seed.</h3>
+            <p>La cargás palabra por palabra usando los tres botones del dispositivo. No hace falta conectarlo a una computadora.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">02 · SPLIT</div>
+            <h3>Obtiene tres frases BIP39.</h3>
+            <p>SeedSplitter muestra tres seed phrases válidas y distintas. Cada una puede interpretarse como una wallet BIP39 independiente.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">03 · DISTRIBUTE</div>
+            <h3>Las guardás por separado.</h3>
+            <p>Podés elegir ubicaciones y custodios diferentes para reducir el riesgo de pérdida, robo o destrucción de una única copia.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">04 · RECOVER</div>
+            <h3>Cualquier par recupera la original.</h3>
+            <p>Ingresás dos de las tres partes y SeedSplitter reconstruye la seed original de 12 o 24 palabras.</p>
+          </article>
+        </div>
+
+        <div class="recovery-strip">
+          <div>
+            <strong>La recuperación no depende de conservar el hardware.</strong>
+            <p>El repositorio incluye <span class="mono">recover.py</span> para reconstruir la seed original a partir de dos partes.</p>
+          </div>
+          <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/recover.py" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER recover.py EN GITHUB ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="section alt" id="seguridad">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-tag">// MODELO DE SEGURIDAD</div>
+            <h2>Menos promesas.<br>Más cosas verificables.</h2>
+          </div>
+          <p>
+            SeedSplitter está pensado para que las propiedades importantes puedan inspeccionarse: el firmware es público, el hardware está expuesto y el repositorio incluye vectores reproducibles para comprobar el comportamiento.
+          </p>
+        </div>
+
+        <div class="security-grid">
+          <article class="security-card">
+            <div class="security-mark">01</div>
+            <h3>SIN WI-FI NI BLUETOOTH</h3>
+            <p>El diseño no incorpora radios Wi-Fi ni Bluetooth. Las operaciones de generación, división, recuperación y derivación ocurren localmente.</p>
+          </article>
+          <article class="security-card">
+            <div class="security-mark">02</div>
+            <h3>SIN PERSISTENCIA DE LA SEED</h3>
+            <p>La seed y las tiradas se procesan en memoria de trabajo; el firmware no las escribe como datos de usuario en almacenamiento persistente.</p>
+          </article>
+          <article class="security-card">
+            <div class="security-mark">03</div>
+            <h3>HARDWARE VISIBLE</h3>
+            <p>El microcontrolador, la pantalla y las conexiones quedan físicamente expuestos para facilitar la inspección del dispositivo.</p>
+          </article>
+          <article class="security-card">
+            <div class="security-mark">04</div>
+            <h3>CÓDIGO ABIERTO</h3>
+            <p>Firmware, scripts de recuperación y tests están publicados. Podés leer el código, compilarlo y comparar resultados conocidos.</p>
+          </article>
+          <article class="security-card">
+            <div class="security-mark">05</div>
+            <h3>ENTROPÍA APORTADA POR VOS</h3>
+            <p>Generate usa 50 tiradas físicas como fuente de entropía. No necesitás confiar en un generador aleatorio interno para crear la seed.</p>
+          </article>
+          <article class="security-card">
+            <div class="security-mark">06</div>
+            <h3>TESTS REPRODUCIBLES</h3>
+            <p>El repositorio incluye pruebas de Split, Recover, Generate y exportación watch-only para frases de 12 y 24 palabras.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADVANCED HONEYPOT -->
+    <section class="section">
+      <div class="container">
+        <div class="advanced">
+          <div>
+            <div class="section-tag orange">// USO AVANZADO</div>
+            <h2>Las partes también son wallets BIP39 válidas.</h2>
+          </div>
+          <div>
+            <p>
+              Las tres partes generadas por Split no son cadenas ilegibles: son frases BIP39 válidas. Eso permite, si querés, usar una parte como wallet señuelo o “canary”: asignarle una pequeña cantidad y monitorear sus direcciones para detectar si ese backup fue accedido.
+            </p>
+            <p>
+              <strong>Eso no convierte a la parte en la seed original.</strong> Una sola parte no alcanza para reconstruir la wallet protegida; para recuperar la seed original siguen haciendo falta dos de las tres partes.
+            </p>
+            <div class="advanced-note">
+              Esta es una estrategia opcional de monitoreo, no un reemplazo de una política de backups, privacidad y custodia bien diseñada.
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- USE CASES -->
-  <section class="section">
-    <div class="section-tag">// CASOS DE USO</div>
-    <h2>¿Para quién es<br>SeedSplitter?</h2>
-    <div class="cases-grid">
-      <div class="case-card">
-        <h3>🏠 El holder tranquilo</h3>
-        <p>Guardás una parte en casa, otra en una caja de seguridad del banco, y la tercera con un familiar de confianza. Perdés una y seguís teniendo acceso.</p>
+    <!-- TESTS -->
+    <section class="section alt" id="tests">
+      <div class="container">
+        <div class="test-panel">
+          <div>
+            <div class="section-tag">// NO CONFÍES: VERIFICÁ</div>
+            <h3>Probalo contra vectores conocidos antes de usar fondos.</h3>
+            <p>
+              El repositorio trae un procedimiento de test y un script que genera casos nuevos para Split y Generate. En Generate también calcula direcciones BIP84 para comprobar que la zpub importada en una wallet watch-only produce las direcciones esperadas.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;">
+              <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/TEST.md" target="_blank" rel="noopener" class="btn btn-secondary btn-small">LEER TEST.md ↗</a>
+              <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO ↗</a>
+            </div>
+          </div>
+          <div class="code-box">$ python3 test.py
+
+Split — 12 palabras
+Split — 24 palabras
+Generate — 12 palabras
+Generate — 24 palabras
+Watch-only — BIP84 addresses</div>
+        </div>
       </div>
-      <div class="case-card">
-        <h3>🔒 El que se toma la seguridad en serio</h3>
-        <p>No importa si te roban, si perdés un papel o si falla un lugar de guardado. Con 2 de las 3 partes siempre podés recuperar todo.</p>
+    </section>
+
+    <!-- PRICE -->
+    <section class="section" id="precio">
+      <div class="container">
+        <div class="price-panel">
+          <div class="price-side">
+            <div class="price-kicker">// PRECIO DE LANZAMIENTO</div>
+            <div class="price">$20.000 <small>ARS</small></div>
+            <p>Primeras 100 unidades. La siguiente tanda figura actualmente a $60.000 ARS.</p>
+            <a href="#comprar" class="btn btn-primary btn-small">ASEGURAR MI UNIDAD</a>
+          </div>
+          <div class="price-side">
+            <div class="progress-label">
+              <span>PRIMERA TANDA</span>
+              <span>23 / 100</span>
+            </div>
+            <div class="progress" aria-label="23 de 100 unidades vendidas"><div></div></div>
+            <p>
+              23 unidades vendidas según el contador actual del sitio. Si este número cambia, actualizalo directamente en este bloque del HTML.
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="case-card">
-        <h3>👨‍👩‍👧 El que piensa en el futuro</h3>
-        <p>Distribuís las 3 partes entre tus herederos. Nadie puede acceder solo, pero juntos pueden recuperar todo si algo te pasa.</p>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section alt" id="faq">
+      <div class="container">
+        <div class="simple-head">
+          <div class="section-tag">// PREGUNTAS FRECUENTES</div>
+          <h2>Lo importante, sin letra chica.</h2>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>¿Qué es una zpub?</summary>
+            <div class="faq-answer">
+              Es una clave pública extendida para una cuenta Bitcoin Native SegWit. Permite derivar las direcciones públicas de esa cuenta y construir una wallet watch-only, pero no contiene las claves privadas necesarias para firmar transacciones.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿La zpub permite gastar mis bitcoins?</summary>
+            <div class="faq-answer">
+              No. La zpub sirve para observar y derivar direcciones, no para firmar. Sin embargo, sí revela información sobre las direcciones y actividad de esa cuenta, por lo que debe tratarse como información sensible desde el punto de vista de la privacidad.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Qué derivation path usa la exportación watch-only?</summary>
+            <div class="faq-answer">
+              La implementación actual usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. La derivación BIP39 usa passphrase vacía.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿SeedSplitter soporta BIP39 passphrase en la exportación watch-only?</summary>
+            <div class="faq-answer">
+              La versión actual del firmware deriva la zpub con passphrase BIP39 vacía. La página no asume soporte para una passphrase adicional.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Qué pasa si pierdo o rompo SeedSplitter?</summary>
+            <div class="faq-answer">
+              Si usaste Split, la recuperación de la seed original no depende del hardware: el repositorio incluye <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/recover.py" target="_blank" rel="noopener">recover.py</a>, que reconstruye la original a partir de dos de las tres partes.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Qué pasa si pierdo una de las tres partes?</summary>
+            <div class="faq-answer">
+              El esquema requiere cualquier combinación de dos partes para reconstruir la seed original. Perder una de las tres no impide la recuperación, siempre que las otras dos sigan disponibles.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Las tres partes son seed phrases reales?</summary>
+            <div class="faq-answer">
+              Sí. El proyecto genera tres frases BIP39 válidas y distintas. Eso permite abrir cada parte como una wallet BIP39 independiente; una sola parte, sin embargo, no reconstruye la seed original protegida.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Necesito conectar SeedSplitter a una computadora?</summary>
+            <div class="faq-answer">
+              No para usar Split, Recover o Generate. El dispositivo funciona de manera autónoma. Para watch-only, la transferencia de la zpub se hace visualmente mediante QR hacia una wallet compatible.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Por qué 50 tiradas?</summary>
+            <div class="faq-answer">
+              Cincuenta resultados independientes de un dado de seis caras contienen aproximadamente 129 bits de entropía teórica (<code>50·log2(6)</code>). El firmware usa esa fuente física para construir la seed BIP39.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿Cómo verifico que mi unidad funciona correctamente?</summary>
+            <div class="faq-answer">
+              Usá los vectores publicados en <a href="https://github.com/SeedSplitter/SeedSplitter/blob/main/TEST.md" target="_blank" rel="noopener">TEST.md</a> y compará palabra por palabra y, para Generate, también las direcciones BIP84 derivadas desde la exportación watch-only. Las seeds de test nunca deben usarse para guardar fondos.
+            </div>
+          </details>
+
+          <details>
+            <summary>¿El código y el hardware se pueden auditar?</summary>
+            <div class="faq-answer">
+              El firmware y las herramientas auxiliares están publicados en GitHub. El dispositivo además deja visibles sus componentes principales —microcontrolador STM32, pantalla OLED y conexiones— para facilitar su inspección física.
+            </div>
+          </details>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FAQ -->
-  <section class="section" id="faq" style="padding-top:0;">
-    <div class="section-tag">// PREGUNTAS FRECUENTES</div>
-    <h2>Todo lo que<br>querés saber.</h2>
-    <div class="faq-list">
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué pasa si se rompe o pierdo el dispositivo?<span class="arrow">+</span></summary>
-        <div class="faq-a">No perdés nada. Con el software que brindamos, igual podés reconstruir tu clave original desde cualquier computadora usando 2 de las 3 partes. Sin el hardware, sin llamarnos, sin depender de nadie.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Cómo sé que el dispositivo no guarda mi seed?<span class="arrow">+</span></summary>
-        <div class="faq-a">El firmware es open-source y el hardware está a la vista. La seed se procesa en RAM y el programa no la escribe en almacenamiento persistente. Podés auditar el código y verificar el comportamiento por tu cuenta.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Qué pasa si pierdo una de las 3 partes?<span class="arrow">+</span></summary>
-        <div class="faq-a">No pasa nada. El sistema requiere solo 2 de las 3 partes para reconstruir la clave original. Podés perder una parte sin perder el acceso a tus fondos.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Funciona con cualquier wallet de Bitcoin?<span class="arrow">+</span></summary>
-        <div class="faq-a">Sí. SeedSplitter trabaja con seed phrases estándar BIP39 (12 o 24 palabras), que son compatibles con la gran mayoría de wallets: Electrum, Sparrow, Ledger, Trezor, y muchos más.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Necesito conectarlo a una computadora?<span class="arrow">+</span></summary>
-        <div class="faq-a">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una cámara. No hay software que instalar ni computadora involucrada.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Por qué el precio es tan bajo si protege tanto dinero?<span class="arrow">+</span></summary>
-        <div class="faq-a">Este es el precio de lanzamiento para las primeras 100 unidades. Queremos que la mayor cantidad de gente pueda acceder a esta protección. A partir de la segunda tanda, el precio sube a $60.000.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Cuáles son los componentes principales del hardware?<span class="arrow">+</span></summary>
-        <div class="faq-a">Consiste en un microcontrolador STM32 (Blue Pill), una pantalla OLED 0.91 y una placa para botones y conexiones.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Es posible auditar el hardware?<span class="arrow">+</span></summary>
-        <div class="faq-a">Sí, el dispositivo es completamente desmontable, permitiendo inspeccionar el STM32, la OLED y las conexiones de la placa.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Es posible auditar el software?<span class="arrow">+</span></summary>
-        <div class="faq-a">Sí, el dispositivo es 100% open-source. Puedes chequear <a href="https://github.com/SeedSplitter/SeedSplitter">el código</a>, compilarlo y subirlo a tu dispositivo.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Cómo puedo comprobar que mi SeedSplitter funciona correctamente?<span class="arrow">+</span></summary>
-        <div class="faq-a">El repositorio incluye vectores de prueba para Split, Recover y Generate, tanto de 12 como de 24 palabras. Podés ingresar esos ejemplos en el dispositivo y comparar el resultado palabra por palabra. También incluimos un script que genera nuevos casos de prueba. Las seeds publicadas allí son exclusivamente para testing y nunca deben usarse para guardar fondos.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Es necesario reunir físicamente dos partes en el mismo lugar para recuperar mi clave?<span class="arrow">+</span></summary>
-        <div class="faq-a">No necesariamente. Podés usar una batería portátil (power bank) para mantener el dispositivo encendido mientras te trasladás. Cargás la Parte A en su ubicación geográfica, guardás el dispositivo encendido en tu mochila y, horas después, cargás la Parte B en su respectivo lugar. Al no apagar el SeedSplitter, la memoria volátil retiene la primera parte, permitiéndote reconstruir tu seed original sin que los dos respaldos físicos coincidan nunca en el mismo espacio tiempo. Es la forma más segura de moverte por la ciudad sin exponer tu soberanía.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary class="faq-q">¿Por qué 50 tiradas para 12 o 24 palabras?<span class="arrow">+</span></summary>
-        <div class="faq-a">Porque 50 tiradas alcanzan ~128 bits de seguridad criptográfica. Las claves secp256k1 usadas por Bitcoin tienen un nivel de seguridad clásico de ~128 bits frente a ataques genéricos, así que agregar más entropía a la seed no aumenta el nivel efectivo de seguridad de la clave frente a ese tipo de ataque. 
-          Con 50 tiradas obtenés el nivel de seguridad criptográfica máxima, usando una fuente física de azar simple y verificable.</div>
-      </details>
-
-    </div>
-  </section>
-
-  <!-- BUY -->
-  <section class="buy-section" id="comprar">
-    <div class="buy-inner">
-      <div class="section-tag" style="margin-bottom:1rem;">// CONSEGUÍ EL TUYO</div>
-      <h2>Protegé tu<br><span style="color:var(--green)">soberanía.</span></h2>
-      <p>Dividí tu seed. Guardá las partes por separado.<br>Recuperala con cualquier par.</p>
-      <div class="buy-price-big">PRECIO DE LANZAMIENTO</div>
-      <div class="buy-amount">$20.000 ARS</div>
-      <div class="buy-note">⚡ SOLO PRIMERAS 100 UNIDADES — DESPUÉS $60.000</div>
-      <!-- REEMPLAZAR href CON TU LINK DE MERCADO PAGO / WHATSAPP / ETC -->
-      <a href="mailto:SeedSplitterAr@gmail.com" class="btn-buy" target="_blank">
-        COMPRAR POR MAIL →
-      </a>
-      <div class="buy-contact">
-        ¿Tenés preguntas? Escribinos a
-        <a href="mailto:SeedSplitterAr@gmail.com">SeedSplitterAr@gmail.com</a>
+    <!-- BUY -->
+    <section class="buy" id="comprar">
+      <div class="container">
+        <div class="section-tag">// SEEDSPLITTER</div>
+        <h2>Generá. Protegé.<br><span class="green">Verificá.</span></h2>
+        <p>Hardware offline y open-source, hecho en Argentina.</p>
+        <div class="buy-price">
+          <span>PRECIO DE LANZAMIENTO</span>
+          <strong>$20.000 ARS</strong>
+        </div>
+        <a href="mailto:SeedSplitterAr@gmail.com" class="btn btn-primary">COMPRAR POR MAIL →</a>
+        <div class="contact">Consultas: <a href="mailto:SeedSplitterAr@gmail.com">SeedSplitterAr@gmail.com</a></div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- FOOTER -->
   <footer>
-    <div class="logo">SEED SPLITTER</div>
-    <p>PROTEGIENDO SOBERANÍAS · HECHO EN ARGENTINA</p>
-    <div style="margin-top:1.2rem; display:flex; justify-content:center; align-items:center; gap:1.5rem; flex-wrap:wrap;">
-      <a href="https://github.com/SeedSplitter/SeedSplitter"
-         target="_blank"
-         style="font-family:var(--mono); font-size:0.75rem; color:var(--text-dim); text-decoration:none; letter-spacing:1px; transition:color 0.2s;"
-         onmouseover="this.style.color='var(--green)'"
-         onmouseout="this.style.color='var(--text-dim)'">
-        ↗ GitHub · Código abierto
-      </a>
-      <span style="color:#2a2a2a;">|</span>
-      <a href="https://x.com/SeedSplitterAr"
-         target="_blank"
-         style="font-family:var(--mono); font-size:0.75rem; color:var(--text-dim); text-decoration:none; letter-spacing:1px; transition:color 0.2s;"
-         onmouseover="this.style.color='var(--green)'"
-         onmouseout="this.style.color='var(--text-dim)'">
-        ✕ @SeedSplitterAr en X
-      </a>
+    <div class="container footer-row">
+      <div>SEEDSPLITTER · PROTEGIENDO SOBERANÍAS · ARGENTINA</div>
+      <div class="footer-links">
+        <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://x.com/SeedSplitterAr" target="_blank" rel="noopener">X · @SeedSplitterAr ↗</a>
+      </div>
     </div>
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </footer>
 
-  <script>
-    // FAQ Toggle — inline style approach, no CSS class dependency
-    function initFaq() {
-      var items = document.querySelectorAll('.faq-item');
-      items.forEach(function(item) {
-        var answer = item.querySelector('.faq-a');
-        var arrow = item.querySelector('.arrow');
-        // Make sure answer starts hidden
-        answer.style.maxHeight = '0';
-        answer.style.overflow = 'hidden';
-        answer.style.transition = 'max-height 0.3s ease';
-        answer.style.padding = '0 2rem';
-
-        item.style.cursor = 'pointer';
-        item.addEventListener('click', function() {
-          var isOpen = item.getAttribute('data-open') === 'true';
-          // Close all
-          items.forEach(function(i) {
-            i.querySelector('.faq-a').style.maxHeight = '0';
-            i.querySelector('.faq-a').style.padding = '0 2rem';
-            i.querySelector('.arrow').style.transform = 'rotate(0deg)';
-            i.setAttribute('data-open', 'false');
-          });
-          // Open clicked if it was closed
-          if (!isOpen) {
-            answer.style.maxHeight = '400px';
-            answer.style.padding = '1.5rem 2rem';
-            arrow.style.transform = 'rotate(45deg)';
-            item.setAttribute('data-open', 'true');
-          }
-        });
-      });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initFaq);
-    } else {
-      initFaq();
-    }
-
-    // Animate progress bar on load
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('progress').style.width = '23%';
-      }, 500);
-    });
+</body>
+</html>
