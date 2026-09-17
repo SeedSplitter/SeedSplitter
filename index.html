@@ -1036,7 +1036,7 @@
         <div class="recovery-strip">
           <div>
             <strong>La recuperación no depende de conservar el hardware.</strong>
-            <p>El repositorio incluye <span class="mono">recover.py</span> para reconstruir la seed original a partir de dos partes.</p>
+            <p>El repositorio incluye un script para reconstruir la seed original a partir de dos partes.</p>
           </div>
           <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO ↗</a>
         </div>
@@ -1331,26 +1331,14 @@ Watch-only — BIP84 addresses</div>
             <div class="faq-answer">Sí. Split genera tres frases BIP39 válidas y distintas. Cada parte puede abrirse como una wallet BIP39 independiente; por eso también puede utilizarse opcionalmente como honeypot. Una sola parte, sin embargo, no permite reconstruir la seed original protegida.</div>
           </details>
 
-          <div class="faq-subhead">GENERATE + WATCH-ONLY</div>
-
           <details>
-            <summary>¿Qué es una zpub?</summary>
-            <div class="faq-answer">Es una clave pública extendida para una cuenta Bitcoin Native SegWit. Permite derivar las direcciones públicas de esa cuenta y construir una wallet watch-only, pero no contiene las claves privadas necesarias para firmar transacciones.</div>
+            <summary>¿Qué es la zpub que genera SeedSplitter y qué derivation path usa?</summary>
+            <div class="faq-answer">Es la clave pública extendida de la cuenta Bitcoin Native SegWit que SeedSplitter deriva para crear una wallet watch-only. Permite derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas necesarias para firmar ni gastar. La implementación usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. Como la zpub permite observar toda la actividad de esa cuenta, conviene tratarla como información sensible desde el punto de vista de la privacidad.</div>
           </details>
 
           <details>
-            <summary>¿La zpub permite gastar mis bitcoins?</summary>
-            <div class="faq-answer">No. La zpub sirve para observar y derivar direcciones, no para firmar. Sin embargo, sí revela información sobre las direcciones y actividad de esa cuenta, por lo que debe tratarse como información sensible desde el punto de vista de la privacidad.</div>
-          </details>
-
-          <details>
-            <summary>¿Qué derivation path usa la exportación watch-only?</summary>
-            <div class="faq-answer">La implementación actual usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. La derivación BIP39 usa passphrase vacía.</div>
-          </details>
-
-          <details>
-            <summary>¿SeedSplitter soporta BIP39 passphrase en la exportación watch-only?</summary>
-            <div class="faq-answer">La versión actual del firmware deriva la zpub con passphrase BIP39 vacía. La página no asume soporte para una passphrase adicional.</div>
+            <summary>¿SeedSplitter soporta BIP39 passphrase?</summary>
+            <div class="faq-answer"><strong>No.</strong> No recomendamos usar passphrases BIP39 como mecanismo de backup. Una seed protegida con passphrase funciona, en la práctica, como un esquema 2-de-2: necesitás conservar tanto la seed como la passphrase, y perder cualquiera de las dos implica perder el acceso. SeedSplitter está diseñado con la filosofía opuesta: un backup 2-de-3, donde cualquier dos de las tres partes permiten recuperar la seed original y perder una no te deja afuera. Por ese motivo, Generate deriva la zpub usando una passphrase BIP39 vacía.</div>
           </details>
         </div>
       </div>
