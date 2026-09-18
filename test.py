@@ -73,8 +73,10 @@ for number, words in enumerate((12, 24), 3):
     addresses = watch_only_addresses(seed)
 
     print(f"\nEl dispositivo debe mostrar exactamente esta seed:\n\n{seed}")
-    print("\nDespués de importar el QR en una wallet BIP84 (por ejemplo BlueWallet),")
-    print("las primeras tres direcciones de recepción deben ser:")
+    print("\nGenerate termina después de mostrar la seed.")
+    print("Volvé al menú, elegí zpub, ingresá esa misma seed y escaneá el QR.")
+    print("En una wallet BIP84 (por ejemplo BlueWallet), las primeras tres")
+    print("direcciones de recepción deben ser:")
     for i, address in enumerate(addresses, 1):
         print(f"  {i}. {address}")
 

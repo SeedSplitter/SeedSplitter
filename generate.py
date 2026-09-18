@@ -1,12 +1,10 @@
-## Genera una seed phrase segura y una billetera watch-only.
+## Genera una seed phrase BIP39 segura.
 ## Se recomienda ejecutar el script en un Live OS (como Tails o Ubuntu)
 ## desde un USB, en una PC air-gapped (sin conexión a internet).
 
 import hashlib
 import os
 import mnemonic
-import qrcode
-from bip_utils import Bip39SeedGenerator, Bip84, Bip84Coins
 
 
 def read_word_count():
@@ -51,14 +49,3 @@ mnemo = mnemonic.Mnemonic("english")
 seed_phrase = mnemo.to_mnemonic(entropy)
 print("\n--- seed phrase ---")
 print(seed_phrase)
-
-# Derivar la cuenta BIP84 m/84'/0'/0' para importarla como watch-only.
-seed_bytes = Bip39SeedGenerator(seed_phrase).Generate()
-bip84_mst = Bip84.FromSeed(seed_bytes, Bip84Coins.BITCOIN)
-bip84_acc = bip84_mst.Purpose().Coin().Account(0)
-zpub = bip84_acc.PublicKey().ToExtended()
-
-img = qrcode.make(zpub)
-img.save("zpub_qr.png")
-print("\n--- zpub guardada como QR en 'zpub_qr.png' ---")
-print(zpub)

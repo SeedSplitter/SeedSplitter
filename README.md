@@ -33,28 +33,52 @@ Si querés crear una seed desde cero:
 3. Tirás un dado físico de seis caras **50 veces** e ingresás cada resultado (`1` a `6`).
 4. SeedSplitter genera una frase BIP39 válida completamente offline.
 
+### Generar la zpub / watch-only
+
+Para obtener la información pública de una seed sin cargarla en una computadora:
+
+1. Elegí **zpub** en el menú.
+2. Elegí **12** o **24 palabras**.
+3. Ingresá la seed manualmente.
+4. SeedSplitter valida el checksum BIP39 y, si es correcto, genera la `zpub` BIP84 y la muestra como QR animado.
+
+Este flujo también sirve para volver a ingresar una seed recién creada con **Generate** y verificar que fue anotada correctamente antes de fondearla.
+
 Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográfica**, en línea con el nivel de seguridad clásico de las claves secp256k1 usadas por Bitcoin. Siempre deben ser independientes, secretas y realizadas con un dado razonablemente justo.
 
 ---
 
 ## Tests reproducibles
 
-El repositorio incluye pruebas reproducibles para verificar `Split`, `Generate` y la exportación watch-only en 12 y 24 palabras.
+El repositorio incluye `test.py` para comparar directamente el comportamiento del hardware con una implementación Python independiente.
 
-- [`TEST.md`](TEST.md): explica cómo ejecutar las pruebas y comparar los resultados con el hardware.
-- [`test.py`](test.py): genera casos de prueba nuevos para `Split` y `Generate`, incluidas las primeras direcciones BIP84 para verificar la exportación watch-only.
+Para ejecutarlo:
 
 ```bash
+pip install mnemonic pyfinite bip-utils
 python3 test.py
 ```
 
-Las seeds y tiradas generadas durante estas pruebas son sólo para testeo y **nunca deben usarse para guardar fondos**.
+Cada ejecución genera cuatro casos nuevos, en este orden:
+
+1. **Split — 12 palabras**
+2. **Split — 24 palabras**
+3. **Generate — 12 palabras**
+4. **Generate — 24 palabras**
+
+En cada caso, `test.py` indica qué opción seleccionar en SeedSplitter, qué seed o tiradas ingresar y qué resultado debería mostrar el dispositivo. La comparación debe hacerse palabra por palabra.
+
+Para **Split**, el script genera una seed BIP39 de prueba y calcula las tres shares que debería producir SeedSplitter. Para probar **Recover**, ingresá dos de esas tres shares: la seed recuperada debe coincidir con la seed original del mismo test.
+
+Para **Generate**, el script genera 50 tiradas de dado de prueba y calcula la seed BIP39 esperada. **Generate debe terminar después de mostrar las palabras.** Para probar **zpub**, elegí **zpub**, ingresá esa misma seed y escaneá el QR watch-only. `test.py` calcula de manera independiente las primeras tres direcciones externas BIP84 (`m/84'/0'/0'/0/0`, `/0/1` y `/0/2`), que deben coincidir exactamente. En una computadora, el mismo flujo se reproduce con `generate.py` seguido de `zpub.py`.
+
+Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**.
 
 ---
 
 ## Scripts offline
 
-El repositorio incluye tres scripts para usar las funciones principales desde una computadora. Sus dependencias pueden instalarse con:
+El repositorio incluye cuatro scripts para usar las funciones principales desde una computadora. Sus dependencias pueden instalarse con:
 
 ```bash
 pip install mnemonic pyfinite bip-utils "qrcode[pil]"
@@ -62,12 +86,14 @@ pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 
 - `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
 - `recover.py`: reconstruye la seed original a partir de 2 shares.
-- `generate.py`: genera una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo, y exporta la cuenta BIP84 watch-only como `zpub` y QR.
+- `generate.py`: genera una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
+- `zpub.py`: recibe una seed BIP39 de 12 o 24 palabras, valida su checksum y exporta la cuenta BIP84 watch-only como `zpub` y QR.
 
 ```bash
 python3 split.py
 python3 recover.py
 python3 generate.py
+python3 zpub.py
 ```
 
 Para trabajar con una seed real, se recomienda ejecutar estos scripts en un Live OS (como Tails o Ubuntu), desde un USB y en una PC air-gapped, sin conexión a internet.
