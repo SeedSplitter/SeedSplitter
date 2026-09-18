@@ -11,7 +11,7 @@ Para compilar, configura el Arduino IDE con los siguientes parámetros:
 1.  **Placa:** `Generic STM32F1 series`
 2.  **Board part number:** `BluePill F103C8`
 3.  **Upload Method:** `STM32CubeProgrammer (SWD)`
-4.  **USB Support:** `CDC (generic Serial supersede U(S)ART)`
+4.  **USB Support:** `None`
 5.  **Librerías necesarias:**
     * `Tiny4kOLED`: Para el manejo de la pantalla SSD1306.
     * `Crypto`: SHA-256 y SHA-512/HMAC para BIP-39/BIP-32.
@@ -76,56 +76,13 @@ Selecciona **Generate -> 12 words** e ingresa estas 50 tiradas:
 
 `diet glad hat rural panther lawsuit act drop gallery urge where fit`
 
-Después de importar el QR watch-only en una wallet BIP84 compatible, las tres primeras direcciones de recepción deben ser:
+Para comprobar **zpub** con esa seed, entra en **zpub -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
 
 1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
 2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
 3. `bc1qea22ynu5gdn8kxjxzlr3wcqhmyc4497pttca29`
 
 Este vector permite comprobar con un caso fijo tanto la generación BIP-39 a partir de los dados como la exportación watch-only BIP84.
-
-## 🚀 Uso
-
-Al encender el dispositivo, el menú principal muestra las tres opciones disponibles: **Split**, **Recover** y **Generate**. Usa los botones **LEFT** y **RIGHT** para mover la selección y **ENTER** para confirmar.
-
-Después de elegir una opción, selecciona si trabajarás con una frase de **12** o **24 palabras**.
-
-### Split
-
-Usa **Split** para dividir una seed existente en tres partes.
-
-1. Selecciona **Split** y luego **12** o **24 palabras**.
-2. Introduce la seed palabra por palabra. Para cada palabra, navega por las letras con **LEFT/RIGHT** y confirma con **ENTER**. El sistema filtra automáticamente las letras válidas según el diccionario BIP-39.
-3. Al terminar, SeedSplitter genera **3 partes**.
-4. Anota y guarda las tres partes por separado. **Cualquier combinación de 2 partes permite recuperar la seed original.**
-
-### Recover
-
-Usa **Recover** para reconstruir una seed a partir de dos de las tres partes generadas previamente.
-
-1. Selecciona **Recover** y luego **12** o **24 palabras**.
-2. Introduce la primera parte palabra por palabra.
-3. Introduce la segunda parte de la misma manera.
-4. SeedSplitter reconstruye y muestra la seed original.
-
-### Generate
-
-Usa **Generate** para crear una nueva seed a partir de **50 tiradas de un dado físico de seis caras**.
-
-1. Selecciona **Generate** y luego **12** o **24 palabras**.
-2. Tira un dado físico 50 veces. Para cada tirada, selecciona el valor **1–6** con **LEFT/RIGHT** y confirma con **ENTER**; usa `<` si necesitas corregir la tirada anterior.
-3. SeedSplitter genera y muestra la frase BIP-39. Usa **LEFT** para avanzar por las palabras y **RIGHT** para volver atrás. Anota la frase y guárdala de forma segura.
-4. Desde la última palabra, pulsa **LEFT** para acceder a la exportación watch-only por `zpub`. Pulsa **RIGHT** desde el QR para volver a las palabras. La `zpub` es pública y regenerable; la frase BIP-39 es el backup importante y no debe compartirse.
-
-### Export watch-only
-
-El QR está adaptado específicamente a la pantalla OLED de **128x32**. Se usan QR Version 1-L de 21x21 módulos con una zona blanca de 4 píxeles; el símbolo completo ocupa 29x29 píxeles y se coloca en el extremo izquierdo. Los dos renglones disponibles a la derecha muestran `Watch-only` y `zpub nn/NN`. Una `zpub` normal de 111 caracteres se divide en 12 frames BBQr Base32 y cada frame cambia aproximadamente cada 300 ms.
-
-La derivación usa passphrase BIP-39 vacía y Bitcoin mainnet:
-
-`BIP39 -> seed (PBKDF2-HMAC-SHA512) -> BIP32 -> m/84'/0'/0' -> zpub`
-
-El material privado intermedio se mantiene únicamente en RAM y se sobrescribe después de construir la `zpub`.
 
 
 ---

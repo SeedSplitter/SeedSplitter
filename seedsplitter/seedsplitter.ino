@@ -13,10 +13,13 @@
 #define DICE_INPUT      5
 #define INFO_SCREEN     6
 #define SHOW_ZPUB_QR    7
+#define INVALID_SEED    8
+#define ZPUB_ERROR     9
 
 #define MODE_SPLIT      0
 #define MODE_RECOVER    1
 #define MODE_NEW_SEED   2
+#define MODE_ZPUB    3
 
 #define BOTON_RIGHT PA1
 #define BOTON_LEFT PA2
@@ -332,6 +335,43 @@ static void bytes_to_seed(const uint8_t *values, uint16_t *seed, uint8_t checksu
   seed[seed_length - 1] |= checksum;
 }
 
+static bool valid_bip39_checksum() {
+  uint8_t entropy[32];
+  uint8_t digest[32];
+
+  seed_to_bytes(seed_phrase, entropy);
+  sha256.reset();
+  sha256.update(entropy, entropy_bytes());
+  sha256.finalize(digest, sizeof(digest));
+
+  const uint8_t cs_bits = checksum_bit_count();
+  const uint8_t expected = digest[0] >> (8 - cs_bits);
+  const uint8_t mask = (uint8_t)((1U << cs_bits) - 1U);
+  const uint8_t actual = (uint8_t)(seed_phrase[seed_length - 1] & mask);
+
+  secure_zero(entropy, sizeof(entropy));
+  secure_zero(digest, sizeof(digest));
+  return actual == expected;
+}
+
+// Recover accepts only SeedSplitter shares: each share must be a valid
+// BIP39 mnemonic, must carry one of the share identifiers 1..3, and the
+// second share must be different from the first one.
+static bool valid_recovery_share() {
+  if (!valid_bip39_checksum()) return false;
+
+  const uint8_t id = (uint8_t)(seed_phrase[seed_length - 1] & 0x03);
+  if (id == 0) return false;
+
+  if (seeds_cargadas == 1) {
+    const uint8_t first_id =
+        (uint8_t)(workspace.share[0][seed_length - 1] & 0x03);
+    if (id == first_id) return false;
+  }
+
+  return true;
+}
+
 static uint8_t read_raw_buttons() {
   uint8_t state = 0;
   if (digitalRead(BOTON_RIGHT) == LOW) state |= RIGHT;
@@ -365,32 +405,21 @@ static inline void pad_line() {
 }
 
 static void show_main_menu() {
-  const uint8_t selected = op_cont % 3;
+  const uint8_t selected = op_cont % 4;
 
-  // Fixed 2x16 layout. The words never move; only the brackets do.
-  // Row 1: " Split  Recover "
-  // Row 2: " New Seed       "
+  // Fixed 2x16 layout. The words never move: the brackets occupy
+  // reserved spaces immediately before/after the selected option.
   oled.setCursor(0, PRIMER_RENGLON);
-  oled.print(" Split  Recover ");
-  oled.setCursor(0, SEGUNDO_RENGLON);
-  oled.print("    Generate    ");
+  if (selected == MODE_SPLIT) oled.print("[Split] Recover ");
+  else if (selected == MODE_RECOVER) oled.print(" Split [Recover]");
+  else oled.print(" Split  Recover ");
+  pad_line();
 
-  if (selected == MODE_SPLIT) {
-    oled.setCursor(0 * LARGO_LETRA, PRIMER_RENGLON);
-    oled.write('[');
-    oled.setCursor(6 * LARGO_LETRA, PRIMER_RENGLON);
-    oled.write(']');
-  } else if (selected == MODE_RECOVER) {
-    oled.setCursor(7 * LARGO_LETRA, PRIMER_RENGLON);
-    oled.write('[');
-    oled.setCursor(15 * LARGO_LETRA, PRIMER_RENGLON);
-    oled.write(']');
-  } else {
-    oled.setCursor(3 * LARGO_LETRA, SEGUNDO_RENGLON);
-    oled.write('[');
-    oled.setCursor(12 * LARGO_LETRA, SEGUNDO_RENGLON);
-    oled.write(']');
-  }
+  oled.setCursor(0, SEGUNDO_RENGLON);
+  if (selected == MODE_NEW_SEED) oled.print("[Generate] zpub ");
+  else if (selected == MODE_ZPUB) oled.print(" Generate [zpub]");
+  else oled.print(" Generate  zpub ");
+  pad_line();
 
   oled.on();
 }
@@ -457,7 +486,7 @@ static void show_seed_word() {
 
 static void show_word_input_state() {
   oled.setCursor(0, PRIMER_RENGLON);
-  if (seleccion == MODE_SPLIT) {
+  if (seleccion == MODE_SPLIT || seleccion == MODE_ZPUB) {
     print_word_position(word_cont);
   } else {
     if (seeds_cargadas == 0) oled.print("Seed 1, Word ");
@@ -465,6 +494,15 @@ static void show_word_input_state() {
     oled.print(word_cont + 1);
   }
   pad_line();
+
+  // Repaint the already-confirmed prefix as well as the letter currently
+  // being edited.  This keeps the input state self-contained whenever the
+  // screen is redrawn.
+  oled.setCursor(0, SEGUNDO_RENGLON);
+  for (uint8_t i = 0; i < op_cont; i++) {
+    if (palabra[i] == LETRA_ESPACIO) oled.write(' ');
+    else oled.write('a' + palabra[i]);
+  }
 
   oled.setCursor(op_cont * LARGO_LETRA, SEGUNDO_RENGLON);
   if (letter_cont == LETRA_BORRA) oled.write('<');
@@ -479,6 +517,24 @@ static void show_zpub_progress() {
   pad_line();
   oled.setCursor(0, SEGUNDO_RENGLON);
   oled.print("Calculando zpub");
+  pad_line();
+  oled.on();
+}
+
+static void show_invalid_seed() {
+  oled.setCursor(0, PRIMER_RENGLON);
+  oled.print("Seed invalida");
+  pad_line();
+  clear_row(SEGUNDO_RENGLON);
+  oled.on();
+}
+
+static void show_zpub_error() {
+  oled.setCursor(0, PRIMER_RENGLON);
+  oled.print("Watch-only error");
+  pad_line();
+  oled.setCursor(0, SEGUNDO_RENGLON);
+  oled.print("ENTER: menu");
   pad_line();
   oled.on();
 }
@@ -520,8 +576,12 @@ static void show_selected_info() {
     oled.print("Recupera ");
     oled.print(seed_length);
     oled.print(" pal.");
-  } else {
+  } else if (seleccion == MODE_NEW_SEED) {
     oled.print("Genera ");
+    oled.print(seed_length);
+    oled.print(" pal.");
+  } else {
+    oled.print("Ingresa ");
     oled.print(seed_length);
     oled.print(" pal.");
   }
@@ -532,8 +592,10 @@ static void show_selected_info() {
     oled.print("en 3 partes");
   } else if (seleccion == MODE_RECOVER) {
     oled.print("usando 2 partes");
-  } else {
+  } else if (seleccion == MODE_NEW_SEED) {
     oled.print("tirando 50 dados");
+  } else {
+    oled.print("para zpub");
   }
   pad_line();
   oled.on();
@@ -544,13 +606,15 @@ static void start_selected_mode() {
   memset(palabra, 0xff, sizeof(palabra));
 
   if (seleccion == MODE_NEW_SEED) {
-    watch_zpub_ready = false;
-    watch_zpub[0] = '\0';
     dice_count = 0;
     dice_value = 1;
     menu = DICE_INPUT;
     show_dice_input();
   } else {
+    if (seleccion == MODE_ZPUB) {
+      watch_zpub_ready = false;
+      watch_zpub[0] = '\0';
+    }
     clear_row(SEGUNDO_RENGLON);
     menu = WORD_INPUT;
     show_word_input_state();
@@ -560,12 +624,10 @@ static void start_selected_mode() {
 void loop() {
   if (menu == SHOW_ZPUB_QR) {
     update_watchonly_qr();
-    const uint8_t qr_button = read_button_event();
-    if (qr_button == RIGHT) {
-      menu = SHOW_SEED;
-      op_cont = seed_length - 1;
-      show_seed_word();
-    }
+    return;
+  }
+
+  if (menu == INVALID_SEED) {
     return;
   }
 
@@ -575,15 +637,15 @@ void loop() {
   switch (menu) {
     case MAIN_MENU:
       if (button_state == ENTER) {
-        seleccion = op_cont % 3;
+        seleccion = op_cont % 4;
         menu = SEED_LENGTH;
         op_cont = 0;
         show_length_menu();
       } else if (button_state == LEFT) {
-        op_cont = (op_cont + 1) % 3;  // previous option
+        op_cont = (op_cont + 1) % 4;  // next option
         show_main_menu();
       } else if (button_state == RIGHT) {
-        op_cont = (op_cont + 2) % 3;  // next option
+        op_cont = (op_cont + 3) % 4;  // previous option
         show_main_menu();
       }
       break;
@@ -624,8 +686,8 @@ void loop() {
           dice_value = 1;
           if (dice_count == DICE_ROLLS) {
             generate_seed_from_dice();
-            // First present the BIP39 words.  The public watch-only export
-            // is derived only when the user moves forward past the last word.
+            // Generate stops at the BIP39 words. Watch-only export is a
+            // separate zpub flow that requires re-entering the mnemonic.
             op_cont = 0;
             menu = SHOW_SEED;
             show_seed_word();
@@ -647,43 +709,25 @@ void loop() {
       break;
 
     case SHOW_SEED:
-      if (seleccion == MODE_NEW_SEED) {
-        // Preserve SeedSplitter's established word navigation:
-        // LEFT moves forward and RIGHT moves back.  From the final word,
-        // one more LEFT enters the public watch-only export.
-        if (button_state == LEFT) {
-          if (op_cont < seed_length - 1) {
-            op_cont++;
-            show_seed_word();
-          } else {
-            if (!watch_zpub_ready) {
-              show_zpub_progress();
-              if (!generate_watchonly_zpub()) {
-                oled.setCursor(0, PRIMER_RENGLON);
-                oled.print("Watch-only error");
-                pad_line();
-                oled.setCursor(0, SEGUNDO_RENGLON);
-                oled.print("Volver con RIGHT");
-                pad_line();
-                oled.on();
-                break;
-              }
-            }
-            enter_watchonly_qr();
-          }
-        } else if (button_state == RIGHT && op_cont > 0) {
-          op_cont--;
-          show_seed_word();
-        }
-      } else {
-        // Preserve the established navigation for recovered seeds.
-        if (button_state == LEFT && op_cont < seed_length - 1) {
-          op_cont++;
-          show_seed_word();
-        } else if (button_state == RIGHT && op_cont > 0) {
-          op_cont--;
-          show_seed_word();
-        }
+      // Seeds shown by Generate and Recover are display-only.
+      // Generate intentionally does not derive or expose a watch-only QR.
+      if (button_state == LEFT && op_cont < seed_length - 1) {
+        op_cont++;
+        show_seed_word();
+      } else if (button_state == RIGHT && op_cont > 0) {
+        op_cont--;
+        show_seed_word();
+      }
+      break;
+
+    case ZPUB_ERROR:
+      if (button_state == ENTER) {
+        secure_zero(seed_phrase, sizeof(seed_phrase));
+        secure_zero(watch_zpub, sizeof(watch_zpub));
+        watch_zpub_ready = false;
+        op_cont = MODE_ZPUB;
+        menu = MAIN_MENU;
+        show_main_menu();
       }
       break;
 
@@ -755,10 +799,45 @@ void loop() {
 
         if (word_cont == seed_length) {
           if (seleccion == MODE_SPLIT) {
+            if (!valid_bip39_checksum()) {
+              show_invalid_seed();
+              menu = INVALID_SEED;
+              break;
+            }
+
             split();
             menu = SHOW_SHARES;
             op_cont = word_cont = letter_cont = 0;
             show_share_word();
+            break;
+          }
+
+          if (seleccion == MODE_ZPUB) {
+            if (!valid_bip39_checksum()) {
+              show_invalid_seed();
+              menu = INVALID_SEED;
+              break;
+            }
+
+            show_zpub_progress();
+            if (!generate_watchonly_zpub()) {
+              show_zpub_error();
+              menu = ZPUB_ERROR;
+              break;
+            }
+
+            // Only the public zpub is needed once derivation succeeds.
+            // Erase the entered mnemonic before entering the terminal QR screen.
+            secure_zero(seed_phrase, sizeof(seed_phrase));
+            enter_watchonly_qr();
+            break;
+          }
+
+          // Recover validates each entered share before accepting it.  Invalid
+          // input stops here instead of attempting a reconstruction.
+          if (!valid_recovery_share()) {
+            show_invalid_seed();
+            menu = INVALID_SEED;
             break;
           }
 
