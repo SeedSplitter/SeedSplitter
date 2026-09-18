@@ -33,6 +33,8 @@ Si querés crear una seed desde cero:
 3. Tirás un dado físico de seis caras **50 veces** e ingresás cada resultado (`1` a `6`).
 4. SeedSplitter genera una frase BIP39 válida completamente offline.
 
+Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográfica**, en línea con el nivel de seguridad clásico de las claves secp256k1 usadas por Bitcoin. Siempre deben ser independientes, secretas y realizadas con un dado razonablemente justo.
+
 ### Generar la zpub / watch-only
 
 Para obtener la información pública de una seed sin cargarla en una computadora:
@@ -43,8 +45,6 @@ Para obtener la información pública de una seed sin cargarla en una computador
 4. SeedSplitter valida el checksum BIP39 y, si es correcto, genera la `zpub` BIP84 y la muestra como QR animado.
 
 Este flujo también sirve para volver a ingresar una seed recién creada con **Generate** y verificar que fue anotada correctamente antes de fondearla.
-
-Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográfica**, en línea con el nivel de seguridad clásico de las claves secp256k1 usadas por Bitcoin. Siempre deben ser independientes, secretas y realizadas con un dado razonablemente justo.
 
 ---
 
