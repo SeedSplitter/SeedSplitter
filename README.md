@@ -66,12 +66,6 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 3. **Generate — 12 palabras**
 4. **Generate — 24 palabras**
 
-En cada caso, `test.py` indica qué opción seleccionar en SeedSplitter, qué seed o tiradas ingresar y qué resultado debería mostrar el dispositivo. La comparación debe hacerse palabra por palabra.
-
-Para **Split**, el script genera una seed BIP39 de prueba y calcula las tres shares que debería producir SeedSplitter. Para probar **Recover**, ingresá dos de esas tres shares: la seed recuperada debe coincidir con la seed original del mismo test.
-
-Para **Generate**, el script genera 50 tiradas de dado de prueba y calcula la seed BIP39 esperada. **Generate debe terminar después de mostrar las palabras.** Para probar **zpub**, elegí **zpub**, ingresá esa misma seed y escaneá el QR watch-only. `test.py` calcula de manera independiente las primeras tres direcciones externas BIP84 (`m/84'/0'/0'/0/0`, `/0/1` y `/0/2`), que deben coincidir exactamente. En una computadora, el mismo flujo se reproduce con `generate.py` seguido de `zpub.py`.
-
 Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**.
 
 ---
