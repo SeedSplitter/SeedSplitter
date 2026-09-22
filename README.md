@@ -46,6 +46,8 @@ Para obtener la información pública de una seed sin cargarla en una computador
 
 Este flujo también sirve para volver a ingresar una seed recién creada con **Generate** y verificar que fue anotada correctamente antes de fondearla.
 
+---
+
 ## Tests reproducibles
 
 El repositorio incluye `test.py` para comparar directamente el comportamiento del hardware con una implementación Python independiente.
@@ -66,7 +68,6 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 
 Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Este software maneja claves privadas críticas. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. **Prueba antes de usar fondos:** verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
----
 ## 📋 Ejemplos de Testeo
 
 Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba incluidos en el código:
