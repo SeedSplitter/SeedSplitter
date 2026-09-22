@@ -66,7 +66,7 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 3. **Generate — 12 palabras**
 4. **Generate — 24 palabras**
 
-Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Este software maneja claves privadas críticas. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. **Prueba antes de usar fondos:** verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
+Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. Vrifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
 ## 📋 Ejemplos de Testeo
 
