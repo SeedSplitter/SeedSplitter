@@ -46,8 +46,6 @@ Para obtener la información pública de una seed sin cargarla en una computador
 
 Este flujo también sirve para volver a ingresar una seed recién creada con **Generate** y verificar que fue anotada correctamente antes de fondearla.
 
----
-
 ## Tests reproducibles
 
 El repositorio incluye `test.py` para comparar directamente el comportamiento del hardware con una implementación Python independiente.
