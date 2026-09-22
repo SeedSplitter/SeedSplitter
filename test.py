@@ -69,7 +69,8 @@ for number, words in enumerate((12, 24), 3):
     print(f"TEST {number} — GENERATE — {words} PALABRAS")
     print("=" * 72)
     print(f"\nEn SeedSplitter elegí:\n  Generate -> {words} words")
-    print(f"\nIngresá estas 50 tiradas, en este orden:\n\n{rolls}")
+    rolls_display = " ".join(rolls[i:i+5] for i in range(0, 50, 5))
+    print(f"\nIngresá estas 50 tiradas, en este orden:\n\n{rolls_display}")
     addresses = watch_only_addresses(seed)
 
     print(f"\nEl dispositivo debe mostrar exactamente esta seed:\n\n{seed}")
