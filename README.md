@@ -66,7 +66,48 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 3. **Generate — 12 palabras**
 4. **Generate — 24 palabras**
 
-Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**.
+Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Este software maneja claves privadas críticas. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. **Prueba antes de usar fondos:** verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
+
+---
+## 📋 Ejemplos de Testeo
+
+Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba incluidos en el código:
+
+### Test 1: Semilla de 12 palabras
+**Seed:** `abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about`
+
+**Fragmentos resultantes:**
+
+1. `blood dinner alcohol happy duty student bird repair design ripple endless certain`
+2. `conduct proof slot spike matrix cat earn common issue prosper narrow layer`
+3. `decrease must skate rice soap visa fatigue ocean estate bitter survey foot`
+
+### Test 2: Semilla de 24 palabras
+**Seed:** `cook wire acid abuse truly evoke super head insect wedding lonely orchard nuclear damp song winter gossip blue vacant midnight order art glide mystery`
+
+**Fragmentos resultantes:**
+
+1. `excuse question property more proud scrub recall rocket true peanut lemon tragic fall mixed tenant chief dutch predict mother prosper spatial another doll pass`
+2. `useful local bright brother ginger extra good merry final enlist digital garment buffalo early urban happy cave phone involve soap below man equip rough`
+3. `monster special ranch must chicken tell attitude food skull because screen celery sugar wire youth rebel affair bar biology unhappy flash logic hurdle movie`
+
+### Test 3: Generate con 50 tiradas iguales a 1
+
+Selecciona **Generate -> 12 words** e ingresa estas 50 tiradas:
+
+`11111111111111111111111111111111111111111111111111`
+
+**Seed esperada:**
+
+`diet glad hat rural panther lawsuit act drop gallery urge where fit`
+
+Para comprobar **zpub** con esa seed, entra en **zpub -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
+
+1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
+2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
+3. `bc1qea22ynu5gdn8kxjxzlr3wcqhmyc4497pttca29`
+
+Este vector permite comprobar con un caso fijo tanto la generación BIP-39 a partir de los dados como la exportación watch-only BIP84.
 
 ---
 
