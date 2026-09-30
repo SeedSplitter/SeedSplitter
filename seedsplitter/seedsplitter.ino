@@ -416,9 +416,9 @@ static void show_main_menu() {
   pad_line();
 
   oled.setCursor(0, SEGUNDO_RENGLON);
-  if (selected == MODE_NEW_SEED) oled.print("[New]Watch-only ");
-  else if (selected == MODE_ZPUB) oled.print(" New[Watch-only]");
-  else oled.print(" New Watch-only ");
+  if (selected == MODE_NEW_SEED) oled.print("[New]   Lectura ");
+  else if (selected == MODE_ZPUB) oled.print(" New   [Lectura]");
+  else oled.print(" New    Lectura ");
   pad_line();
 
   oled.on();
@@ -595,7 +595,7 @@ static void show_selected_info() {
   } else if (seleccion == MODE_NEW_SEED) {
     oled.print("con 50 tiradas");
   } else {
-    oled.print("watchonly wallet");
+    oled.print("bill. de lectura");
   }
   pad_line();
   oled.on();
