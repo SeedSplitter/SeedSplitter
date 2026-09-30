@@ -273,8 +273,8 @@
       letter-spacing: .04em;
     }
 
-    .mode-chip.generate strong,
-    .mode-chip.zpub strong { color: var(--orange); }
+    .mode-chip.new strong,
+    .mode-chip.watch-only strong { color: var(--orange); }
 
     /* SECTION BASE */
     .section { padding: 92px 0; }
@@ -906,8 +906,8 @@
 
       <nav class="nav-links" aria-label="Navegación principal">
         <a href="#split">CÓMO FUNCIONA</a>
-        <a href="#generate">GENERATE</a>
-        <a href="#zpub">ZPUB</a>
+        <a href="#new">NEW</a>
+        <a href="#watch-only">WATCH-ONLY</a>
         <a href="#honeypot">HONEYPOT</a>
         <a href="#seguridad">SEGURIDAD</a>
         <a href="#faq">FAQ</a>
@@ -929,12 +929,12 @@
             Guardalos por separado: <strong>cualquier combinación de 2 recupera tu seed original</strong>.
           </p>
           <p class="hero-secondary">
-            También puede <strong>generar una seed nueva con 50 tiradas de dado</strong>. Con la función <strong>zpub</strong>, cargás una seed BIP39 de 12 o 24 palabras, se valida su checksum y se muestra por QR la zpub BIP84 para crear una wallet watch-only sin cargar la seed en el teléfono o la computadora.
+            También puede <strong>generar una seed nueva con 50 tiradas de dado</strong>. Con la función <strong>Watch-only</strong>, cargás una seed BIP39 de 12 o 24 palabras, se valida su checksum y se muestra por QR la zpub BIP84 para crear una wallet watch-only sin cargar la seed en el teléfono o la computadora.
           </p>
           <div class="hero-actions">
             <a href="#split" class="btn btn-primary">VER SPLIT / RECOVER</a>
-            <a href="#generate" class="btn btn-secondary">VER GENERATE</a>
-            <a href="#zpub" class="btn btn-secondary">VER ZPUB</a>
+            <a href="#new" class="btn btn-secondary">VER NEW</a>
+            <a href="#watch-only" class="btn btn-secondary">VER WATCH-ONLY</a>
           </div>
           <div class="hero-proof">
             <span>1 seed → 3 backups</span>
@@ -951,8 +951,8 @@
           <div class="mode-strip" aria-label="Funciones principales">
             <div class="mode-chip"><strong>SPLIT</strong>1 seed → 3 backups</div>
             <div class="mode-chip"><strong>RECOVER</strong>2 backups → seed</div>
-            <div class="mode-chip generate"><strong>GENERATE</strong>50 dados → seed</div>
-            <div class="mode-chip zpub"><strong>ZPUB</strong>seed → QR watch-only</div>
+            <div class="mode-chip new"><strong>NEW</strong>50 dados → seed</div>
+            <div class="mode-chip watch-only"><strong>WATCH-ONLY</strong>seed → QR watch-only</div>
           </div>
         </div>
       </div>
@@ -988,13 +988,13 @@
 
           <article class="use-card">
             <div class="num">02</div>
-            <div class="kicker">GENERATE</div>
+            <div class="kicker">NEW</div>
             <h3>Creá una seed nueva con entropía física.</h3>
             <p>
               Elegís 12 o 24 palabras e ingresás 50 tiradas independientes de un dado físico. SeedSplitter genera la frase BIP39 localmente y la muestra palabra por palabra.
             </p>
             <p>
-              Generate termina después de mostrar la seed: la anotás y conservás como cualquier otra seed BIP39.
+              La función New termina después de mostrar la seed: la anotás y conservás como cualquier otra seed BIP39.
             </p>
             <div class="fact">
               <span class="orange">50 tiradas → seed BIP39</span>
@@ -1003,7 +1003,7 @@
 
           <article class="use-card">
             <div class="num">03</div>
-            <div class="kicker">ZPUB · WATCH-ONLY</div>
+            <div class="kicker">WATCH-ONLY</div>
             <h3>Obtené la zpub desde una seed que ya anotaste.</h3>
             <p>
               Elegís 12 o 24 palabras e ingresás la seed. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84 <span class="mono">m/84'/0'/0'</span>.
@@ -1063,14 +1063,14 @@
     </section>
 
 
-    <!-- GENERATE -->
-    <section class="section" id="generate">
+    <!-- NEW -->
+    <section class="section" id="new">
       <div class="container">
         <div class="simple-head">
-          <div class="section-tag">// GENERATE</div>
+          <div class="section-tag">// NEW</div>
           <h2>50 tiradas.<br>Una seed BIP39.</h2>
           <p>
-            Generate crea una seed nueva a partir de entropía física aportada por vos. Elegís 12 o 24 palabras, ingresás exactamente 50 tiradas de un dado de seis caras y SeedSplitter muestra la frase resultante.
+            La función New crea una seed nueva a partir de entropía física aportada por vos. Elegís 12 o 24 palabras, ingresás exactamente 50 tiradas de un dado de seis caras y SeedSplitter muestra la frase resultante.
           </p>
         </div>
 
@@ -1093,23 +1093,23 @@
           <article class="step">
             <div class="step-num">04 · BACKUP</div>
             <h3>La anotás y termina.</h3>
-            <p>Generate termina después de mostrar las palabras. Para obtener una zpub, usás después la función zpub e ingresás la seed que anotaste.</p>
+            <p>La función New termina después de mostrar las palabras. Para crear la wallet watch-only, usás después la función Watch-only e ingresás la seed que anotaste.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ZPUB / WATCH ONLY -->
-    <section class="section alt" id="zpub">
+    <!-- WATCH-ONLY -->
+    <section class="section alt" id="watch-only">
       <div class="container watch-layout">
         <div class="watch-copy">
-          <div class="section-tag">// ZPUB · WATCH-ONLY</div>
+          <div class="section-tag">// WATCH-ONLY</div>
           <h2>Monitoreá Bitcoin sin cargar tu seed en una computadora.</h2>
           <p>
-            En zpub elegís 12 o 24 palabras e ingresás la seed palabra por palabra. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84. Si la frase no es válida, no genera la zpub.
+            En Watch-only elegís 12 o 24 palabras e ingresás la seed palabra por palabra. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84. Si la frase no es válida, no genera la zpub.
           </p>
 
-          <div class="flow" aria-label="Flujo zpub y watch-only">
+          <div class="flow" aria-label="Flujo de Watch-only">
             <div class="flow-box"><strong>SEED BIP39</strong>12 / 24 palabras</div>
             <div class="flow-arrow">→</div>
             <div class="flow-box"><strong>CHECKSUM</strong>validación BIP39</div>
@@ -1195,12 +1195,12 @@
           <article class="security-card">
             <div class="security-mark">05</div>
             <h3>ENTROPÍA APORTADA POR VOS</h3>
-            <p>Generate usa 50 tiradas físicas como fuente de entropía. No necesitás confiar en un generador aleatorio interno para crear la seed.</p>
+            <p>New usa 50 tiradas físicas como fuente de entropía. No necesitás confiar en un generador aleatorio interno para crear la seed.</p>
           </article>
           <article class="security-card">
             <div class="security-mark">06</div>
             <h3>TESTS REPRODUCIBLES</h3>
-            <p>El repositorio incluye pruebas de Split, Recover, Generate y zpub para frases de 12 y 24 palabras.</p>
+            <p>El repositorio incluye pruebas de Split, Recover, New y Watch-only para frases de 12 y 24 palabras.</p>
           </article>
         </div>
       </div>
@@ -1270,7 +1270,7 @@
             <div class="section-tag">// NO CONFÍES: VERIFICÁ</div>
             <h3>Probalo contra vectores conocidos antes de usar fondos.</h3>
             <p>
-              El repositorio trae un procedimiento de test y un script que genera casos nuevos para Split y Generate. Para comprobar zpub, volvés a ingresar la seed generada y comparás las primeras direcciones BIP84 con las calculadas independientemente por el test.
+              El repositorio trae un procedimiento de test y un script que genera casos nuevos para Split y New. Para comprobar Watch-only, volvés a ingresar la seed generada y comparás las primeras direcciones BIP84 con las calculadas independientemente por el test.
             </p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;">
               <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener" class="btn btn-secondary btn-small">VER REPOSITORIO Y TESTS ↗</a>
@@ -1280,9 +1280,9 @@
 
 Split — 12 palabras
 Split — 24 palabras
-Generate — 12 palabras
-Generate — 24 palabras
-zpub — BIP84 addresses</div>
+New — 12 palabras
+New — 24 palabras
+Watch-only — BIP84 addresses</div>
         </div>
       </div>
     </section>
@@ -1343,7 +1343,7 @@ zpub — BIP84 addresses</div>
 
           <details>
             <summary>¿Necesito conectarlo a una computadora?</summary>
-            <div class="faq-answer">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una batería portátil. No hay software que instalar ni computadora involucrada para usar Split, Recover, Generate o zpub. En zpub, la clave pública extendida se transfiere visualmente mediante un QR.</div>
+            <div class="faq-answer">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una batería portátil. No hay software que instalar ni computadora involucrada para usar Split, Recover, New o Watch-only. En Watch-only, la clave pública extendida se transfiere visualmente mediante un QR.</div>
           </details>
 
           <details>
@@ -1368,7 +1368,7 @@ zpub — BIP84 addresses</div>
 
           <details>
             <summary>¿Cómo puedo comprobar que mi SeedSplitter funciona correctamente?</summary>
-            <div class="faq-answer">El repositorio incluye vectores de prueba para Split, Recover, Generate y zpub, tanto de 12 como de 24 palabras. Podés ingresar esos ejemplos en el dispositivo y comparar el resultado palabra por palabra o, para zpub, comparar las primeras direcciones BIP84 derivadas. También incluimos un script que genera nuevos casos de prueba. Las seeds publicadas allí son exclusivamente para testing y nunca deben usarse para guardar fondos. Todo el material de verificación está disponible desde <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">el repositorio principal</a>.</div>
+            <div class="faq-answer">El repositorio incluye vectores de prueba para Split, Recover, New y Watch-only, tanto de 12 como de 24 palabras. Podés ingresar esos ejemplos en el dispositivo y comparar el resultado palabra por palabra o, para Watch-only, comparar las primeras direcciones BIP84 derivadas. También incluimos un script que genera nuevos casos de prueba. Las seeds publicadas allí son exclusivamente para testing y nunca deben usarse para guardar fondos. Todo el material de verificación está disponible desde <a href="https://github.com/SeedSplitter/SeedSplitter" target="_blank" rel="noopener">el repositorio principal</a>.</div>
           </details>
 
           <details>
@@ -1387,13 +1387,13 @@ zpub — BIP84 addresses</div>
           </details>
 
           <details>
-            <summary>¿Qué hace la función zpub y qué derivation path usa?</summary>
-            <div class="faq-answer">Es la clave pública extendida de la cuenta Bitcoin Native SegWit que SeedSplitter deriva para crear una wallet watch-only. Permite derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas necesarias para firmar ni gastar. La implementación usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. Como la zpub permite observar toda la actividad de esa cuenta, conviene tratarla como información sensible desde el punto de vista de la privacidad.</div>
+            <summary>¿Qué hace la función Watch-only y qué derivation path usa?</summary>
+            <div class="faq-answer">Watch-only deriva la zpub de la cuenta Bitcoin Native SegWit para crear una wallet de solo observación. La zpub permite derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas necesarias para firmar ni gastar. La implementación usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. Como la zpub permite observar toda la actividad de esa cuenta, conviene tratarla como información sensible desde el punto de vista de la privacidad.</div>
           </details>
 
           <details>
             <summary>¿SeedSplitter soporta BIP39 passphrase?</summary>
-            <div class="faq-answer"><strong>No.</strong> No recomendamos usar passphrases BIP39 como mecanismo de backup. Una seed protegida con passphrase funciona, en la práctica, como un esquema 2-de-2: necesitás conservar tanto la seed como la passphrase, y perder cualquiera de las dos implica perder el acceso. SeedSplitter está diseñado con la filosofía opuesta: un backup 2-de-3, donde cualquier dos de las tres partes permiten recuperar la seed original y perder una no te deja afuera. Por ese motivo, zpub deriva la cuenta usando una passphrase BIP39 vacía.</div>
+            <div class="faq-answer"><strong>No.</strong> No recomendamos usar passphrases BIP39 como mecanismo de backup. Una seed protegida con passphrase funciona, en la práctica, como un esquema 2-de-2: necesitás conservar tanto la seed como la passphrase, y perder cualquiera de las dos implica perder el acceso. SeedSplitter está diseñado con la filosofía opuesta: un backup 2-de-3, donde cualquier dos de las tres partes permiten recuperar la seed original y perder una no te deja afuera. Por ese motivo, Watch-only deriva la cuenta usando una passphrase BIP39 vacía.</div>
           </details>
         </div>
       </div>
