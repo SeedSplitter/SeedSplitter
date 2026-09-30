@@ -100,7 +100,7 @@ Selecciona **New -> 12 words** e ingresa estas 50 tiradas:
 
 `diet glad hat rural panther lawsuit act drop gallery urge where fit`
 
-Para comprobar **zpub** con esa seed, entra en **Watch-only -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
+Para comprobar las direcciones generadas por esa seed, entra en **Watch-only -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
 
 1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
 2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
@@ -121,7 +121,7 @@ pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 - `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
 - `recover.py`: reconstruye la seed original a partir de 2 shares.
 - `new.py`: crea una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
-- `watch-only.py`: recibe una seed BIP39 de 12 o 24 palabras, valida su checksum y exporta la cuenta BIP84 watch-only como `zpub` y QR.
+- `watch-only.py`: recibe una seed BIP39 de 12 o 24 palabras y exporta genera el zpub y QR.
 
 ```bash
 python3 split.py
