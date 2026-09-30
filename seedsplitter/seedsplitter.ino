@@ -416,9 +416,9 @@ static void show_main_menu() {
   pad_line();
 
   oled.setCursor(0, SEGUNDO_RENGLON);
-  if (selected == MODE_NEW_SEED) oled.print("[Generate] zpub ");
-  else if (selected == MODE_ZPUB) oled.print(" Generate [zpub]");
-  else oled.print(" Generate  zpub ");
+  if (selected == MODE_NEW_SEED) oled.print("[New]Watch-only ");
+  else if (selected == MODE_ZPUB) oled.print(" New[Watch-only]");
+  else oled.print(" New Watch-only ");
   pad_line();
 
   oled.on();
@@ -581,9 +581,9 @@ static void show_selected_info() {
     oled.print(seed_length);
     oled.print(" pal.");
   } else {
-    oled.print("Ingresa ");
+    oled.print("Con ");
     oled.print(seed_length);
-    oled.print(" pal.");
+    oled.print(" pal. crea");
   }
   pad_line();
 
@@ -591,11 +591,11 @@ static void show_selected_info() {
   if (seleccion == MODE_SPLIT) {
     oled.print("en 3 partes");
   } else if (seleccion == MODE_RECOVER) {
-    oled.print("usando 2 partes");
+    oled.print("con 2 partes");
   } else if (seleccion == MODE_NEW_SEED) {
-    oled.print("tirando 50 dados");
+    oled.print("con 50 tiradas");
   } else {
-    oled.print("para zpub");
+    oled.print("watchonly wallet");
   }
   pad_line();
   oled.on();
