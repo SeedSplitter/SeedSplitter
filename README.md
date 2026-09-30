@@ -39,7 +39,7 @@ Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográ
 
 Para obtener la información pública de una seed sin cargarla en una computadora:
 
-1. Elegí **Watch-only** en el menú.
+1. Elegí **Lectura** en el menú.
 2. Elegí **12** o **24 palabras**.
 3. Ingresá la seed manualmente.
 4. SeedSplitter valida el checksum BIP39 y, si es correcto, genera la `zpub` BIP84 y la muestra como QR animado.
@@ -100,7 +100,7 @@ Selecciona **New -> 12 words** e ingresa estas 50 tiradas:
 
 `diet glad hat rural panther lawsuit act drop gallery urge where fit`
 
-Para comprobar las direcciones generadas por esa seed, entra en **Watch-only -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
+Para comprobar las direcciones generadas por esa seed, entra en **Lectura -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
 
 1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
 2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
@@ -121,13 +121,13 @@ pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 - `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
 - `recover.py`: reconstruye la seed original a partir de 2 shares.
 - `new.py`: crea una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
-- `watch-only.py`: recibe una seed BIP39 de 12 o 24 palabras y exporta genera el zpub y QR.
+- `lectura.py`: recibe una seed BIP39 de 12 o 24 palabras y exporta genera el zpub y QR.
 
 ```bash
 python3 split.py
 python3 recover.py
 python3 new.py
-python3 watch-only.py
+python3 lectura.py
 ```
 
 Para trabajar con una seed real, se recomienda ejecutar estos scripts en un Live OS (como Tails o Ubuntu), desde un USB y en una PC air-gapped, sin conexión a internet.
