@@ -929,7 +929,7 @@
             Guardalos por separado: <strong>cualquier combinación de 2 recupera tu seed original</strong>.
           </p>
           <p class="hero-secondary">
-            También puede <strong>generar una seed nueva con 50 tiradas de dado</strong>. Con la función <strong>Watch-only</strong>, cargás una seed BIP39 de 12 o 24 palabras, se valida su checksum y se muestra por QR la zpub BIP84 para crear una wallet watch-only sin cargar la seed en el teléfono o la computadora.
+            También puede <strong>generar una seed nueva con 50 tiradas de dado</strong>. Con la opción <strong>Lectura</strong>, cargás una seed BIP39 de 12 o 24 palabras, se valida su checksum y se muestra por QR la zpub BIP84 para crear una wallet watch-only sin cargar la seed en el teléfono o la computadora.
           </p>
           <div class="hero-actions">
             <a href="#split" class="btn btn-primary">VER SPLIT / RECOVER</a>
@@ -952,7 +952,7 @@
             <div class="mode-chip"><strong>SPLIT</strong>1 seed → 3 backups</div>
             <div class="mode-chip"><strong>RECOVER</strong>2 backups → seed</div>
             <div class="mode-chip new"><strong>NEW</strong>50 dados → seed</div>
-            <div class="mode-chip watch-only"><strong>WATCH-ONLY</strong>seed → QR watch-only</div>
+            <div class="mode-chip watch-only"><strong>LECTURA</strong>seed → QR watch-only</div>
           </div>
         </div>
       </div>
@@ -1003,7 +1003,7 @@
 
           <article class="use-card">
             <div class="num">03</div>
-            <div class="kicker">WATCH-ONLY</div>
+            <div class="kicker">LECTURA</div>
             <h3>Obtené la zpub desde una seed que ya anotaste.</h3>
             <p>
               Elegís 12 o 24 palabras e ingresás la seed. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84 <span class="mono">m/84'/0'/0'</span>.
@@ -1081,7 +1081,7 @@
             <p>Definís el tamaño de la frase BIP39 antes de ingresar la entropía.</p>
           </article>
           <article class="step">
-            <div class="step-num">02 · DADOS</div>
+            <div class="step-num">02 · DICE</div>
             <h3>Ingresás 50 tiradas.</h3>
             <p>Usás un dado físico de seis caras e ingresás los resultados en orden, uno por uno.</p>
           </article>
@@ -1093,7 +1093,7 @@
           <article class="step">
             <div class="step-num">04 · BACKUP</div>
             <h3>La anotás y termina.</h3>
-            <p>La función New termina después de mostrar las palabras. Para crear la wallet watch-only, usás después la función Watch-only e ingresás la seed que anotaste.</p>
+            <p>La función New termina después de mostrar las palabras. Para crear la wallet watch-only, usás después la opción Lectura e ingresás la seed que anotaste.</p>
           </article>
         </div>
       </div>
@@ -1106,7 +1106,7 @@
           <div class="section-tag">// WATCH-ONLY</div>
           <h2>Monitoreá Bitcoin sin cargar tu seed en una computadora.</h2>
           <p>
-            En Watch-only elegís 12 o 24 palabras e ingresás la seed palabra por palabra. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84. Si la frase no es válida, no genera la zpub.
+            En el SeedSplitter elegís <strong>Lectura</strong>, seleccionás 12 o 24 palabras e ingresás la seed palabra por palabra. SeedSplitter valida el checksum BIP39 antes de derivar la cuenta BIP84. Si la frase no es válida, no genera la zpub.
           </p>
 
           <div class="flow" aria-label="Flujo de Watch-only">
@@ -1343,7 +1343,7 @@ Watch-only — BIP84 addresses</div>
 
           <details>
             <summary>¿Necesito conectarlo a una computadora?</summary>
-            <div class="faq-answer">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una batería portátil. No hay software que instalar ni computadora involucrada para usar Split, Recover, New o Watch-only. En Watch-only, la clave pública extendida se transfiere visualmente mediante un QR.</div>
+            <div class="faq-answer">No. SeedSplitter funciona de forma completamente autónoma. Solo necesitás el cargador de un celular o una batería portátil. No hay software que instalar ni computadora involucrada para usar Split, Recover, New o Lectura. En la opción Lectura, la clave pública extendida se transfiere visualmente mediante un QR.</div>
           </details>
 
           <details>
@@ -1387,8 +1387,8 @@ Watch-only — BIP84 addresses</div>
           </details>
 
           <details>
-            <summary>¿Qué hace la función Watch-only y qué derivation path usa?</summary>
-            <div class="faq-answer">Watch-only deriva la zpub de la cuenta Bitcoin Native SegWit para crear una wallet de solo observación. La zpub permite derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas necesarias para firmar ni gastar. La implementación usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. Como la zpub permite observar toda la actividad de esa cuenta, conviene tratarla como información sensible desde el punto de vista de la privacidad.</div>
+            <summary>¿Qué hace la opción Lectura (watch-only) y qué derivation path usa?</summary>
+            <div class="faq-answer">La opción Lectura deriva la zpub de la cuenta Bitcoin Native SegWit para crear una wallet watch-only. La zpub permite derivar direcciones, consultar saldo y seguir transacciones, pero no contiene las claves privadas necesarias para firmar ni gastar. La implementación usa Bitcoin mainnet, cuenta 0 y el path BIP84 <code>m/84'/0'/0'</code>. Como la zpub permite observar toda la actividad de esa cuenta, conviene tratarla como información sensible desde el punto de vista de la privacidad.</div>
           </details>
 
           <details>
