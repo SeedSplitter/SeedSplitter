@@ -66,15 +66,15 @@ for number, words in enumerate((12, 24), 3):
     seed = mnemo.to_mnemonic(digest[:16] if words == 12 else digest)
 
     print("\n" + "=" * 72)
-    print(f"TEST {number} — NEW — {words} PALABRAS")
+    print(f"TEST {number} — NUEVA — {words} PALABRAS")
     print("=" * 72)
-    print(f"\nEn SeedSplitter elegí:\n  New -> {words} words")
+    print(f"\nEn SeedSplitter elegí:\n  Nueva -> {words} words")
     rolls_display = " ".join(rolls[i:i+5] for i in range(0, 50, 5))
     print(f"\nIngresá estas 50 tiradas, en este orden:\n\n{rolls_display}")
     addresses = watch_only_addresses(seed)
 
     print(f"\nEl dispositivo debe mostrar exactamente esta seed:\n\n{seed}")
-    print("Volvé al menú, elegí LECTURA, ingresá esa misma seed y escaneá el QR.")
+    print("Volvé al menú, elegí Lectura, ingresá esa misma seed y escaneá el QR.")
     print("En una wallet BIP84 (por ejemplo BlueWallet), las primeras tres")
     print("direcciones de recepción deben ser:")
     for i, address in enumerate(addresses, 1):

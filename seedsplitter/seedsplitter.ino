@@ -416,9 +416,9 @@ static void show_main_menu() {
   pad_line();
 
   oled.setCursor(0, SEGUNDO_RENGLON);
-  if (selected == MODE_NEW_SEED) oled.print("[New]   Lectura ");
-  else if (selected == MODE_ZPUB) oled.print(" New   [Lectura]");
-  else oled.print(" New    Lectura ");
+  if (selected == MODE_NEW_SEED) oled.print("[Nueva] Lectura ");
+  else if (selected == MODE_ZPUB) oled.print(" Nueva [Lectura]");
+  else oled.print(" Nueva  Lectura ");
   pad_line();
 
   oled.on();

@@ -28,7 +28,7 @@ También puede generar una seed BIP39 nueva a partir de entropía física aporta
 
 Si querés crear una seed desde cero:
 
-1. Elegí **New** en el menú.
+1. Elegí **Nueva** en el menú.
 2. Elegí **12** o **24 palabras**.
 3. Tirás un dado físico de seis caras **50 veces** e ingresás cada resultado (`1` a `6`).
 4. SeedSplitter genera una frase BIP39 válida completamente offline.
@@ -44,7 +44,7 @@ Para obtener la información pública de una seed sin cargarla en una computador
 3. Ingresá la seed manualmente.
 4. SeedSplitter valida el checksum BIP39 y, si es correcto, genera la `zpub` BIP84 y la muestra como QR animado.
 
-Este flujo también sirve para volver a ingresar una seed recién creada con **New** y verificar que fue anotada correctamente antes de fondearla.
+Este flujo también sirve para volver a ingresar una seed recién creada con **Nueva** y verificar que fue anotada correctamente antes de fondearla.
 
 ---
 
@@ -63,8 +63,8 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 
 1. **Split — 12 palabras**
 2. **Split — 24 palabras**
-3. **New — 12 palabras**
-4. **New — 24 palabras**
+3. **Nueva — 12 palabras**
+4. **Nueva — 24 palabras**
 
 Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. Verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
@@ -90,9 +90,9 @@ Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba 
 2. `useful local bright brother ginger extra good merry final enlist digital garment buffalo early urban happy cave phone involve soap below man equip rough`
 3. `monster special ranch must chicken tell attitude food skull because screen celery sugar wire youth rebel affair bar biology unhappy flash logic hurdle movie`
 
-### Test 3: Generate con 50 tiradas iguales a 1
+### Test 3: Nueva con 50 tiradas iguales a 1
 
-Selecciona **New -> 12 words** e ingresa estas 50 tiradas:
+Selecciona **Nueva -> 12 words** e ingresa estas 50 tiradas:
 
 `11111111111111111111111111111111111111111111111111`
 
@@ -121,13 +121,13 @@ pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 - `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
 - `recover.py`: reconstruye la seed original a partir de 2 shares.
 - `new.py`: crea una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
-- `lectura.py`: recibe una seed BIP39 de 12 o 24 palabras y exporta genera el zpub y QR.
+- `watch-only.py`: recibe una seed BIP39 de 12 o 24 palabras, genera la `zpub` y la exporta mediante QR.
 
 ```bash
 python3 split.py
 python3 recover.py
 python3 new.py
-python3 lectura.py
+python3 watch-only.py
 ```
 
 Para trabajar con una seed real, se recomienda ejecutar estos scripts en un Live OS (como Tails o Ubuntu), desde un USB y en una PC air-gapped, sin conexión a internet.
