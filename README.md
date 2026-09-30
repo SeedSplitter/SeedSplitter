@@ -28,23 +28,23 @@ También puede generar una seed BIP39 nueva a partir de entropía física aporta
 
 Si querés crear una seed desde cero:
 
-1. Elegí **Generate** en el menú.
+1. Elegí **New** en el menú.
 2. Elegí **12** o **24 palabras**.
 3. Tirás un dado físico de seis caras **50 veces** e ingresás cada resultado (`1` a `6`).
 4. SeedSplitter genera una frase BIP39 válida completamente offline.
 
 Las 50 tiradas están pensadas para alcanzar **~128 bits de seguridad criptográfica**, en línea con el nivel de seguridad clásico de las claves secp256k1 usadas por Bitcoin. Siempre deben ser independientes, secretas y realizadas con un dado razonablemente justo.
 
-### Generar la zpub / watch-only
+### Crear una watch-only wallet
 
 Para obtener la información pública de una seed sin cargarla en una computadora:
 
-1. Elegí **zpub** en el menú.
+1. Elegí **Watch-only** en el menú.
 2. Elegí **12** o **24 palabras**.
 3. Ingresá la seed manualmente.
 4. SeedSplitter valida el checksum BIP39 y, si es correcto, genera la `zpub` BIP84 y la muestra como QR animado.
 
-Este flujo también sirve para volver a ingresar una seed recién creada con **Generate** y verificar que fue anotada correctamente antes de fondearla.
+Este flujo también sirve para volver a ingresar una seed recién creada con **New** y verificar que fue anotada correctamente antes de fondearla.
 
 ---
 
@@ -63,10 +63,10 @@ Cada ejecución genera cuatro casos nuevos, en este orden:
 
 1. **Split — 12 palabras**
 2. **Split — 24 palabras**
-3. **Generate — 12 palabras**
-4. **Generate — 24 palabras**
+3. **New — 12 palabras**
+4. **New — 24 palabras**
 
-Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. Vrifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
+Las seeds y tiradas producidas por `test.py` son exclusivamente para pruebas y **nunca deben usarse para guardar fondos**. Se recomienda estrictamente ejecutarlo en hardware que nunca haya sido (ni sea) conectado a internet. Verifica primero el firmware con los vectores conocidos de este README y con una wallet sin fondos.
 
 ### 📋 Ejemplos de Testeo
 
@@ -92,7 +92,7 @@ Puedes verificar el funcionamiento del algoritmo utilizando los casos de prueba 
 
 ### Test 3: Generate con 50 tiradas iguales a 1
 
-Selecciona **Generate -> 12 words** e ingresa estas 50 tiradas:
+Selecciona **New -> 12 words** e ingresa estas 50 tiradas:
 
 `11111111111111111111111111111111111111111111111111`
 
@@ -100,7 +100,7 @@ Selecciona **Generate -> 12 words** e ingresa estas 50 tiradas:
 
 `diet glad hat rural panther lawsuit act drop gallery urge where fit`
 
-Para comprobar **zpub** con esa seed, entra en **zpub -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
+Para comprobar **zpub** con esa seed, entra en **Watch-only -> 12 words**, ingresa la misma frase y escanea el QR watch-only. Las tres primeras direcciones de recepción deben ser:
 
 1. `bc1q8saa60x70jejyd3cs7qm37qwd293funpmlscgz`
 2. `bc1qu6p9lwm33xyv0rcqk5wk296s98xclv8smtsedw`
@@ -120,14 +120,14 @@ pip install mnemonic pyfinite bip-utils "qrcode[pil]"
 
 - `split.py`: divide una seed BIP39 de 12 o 24 palabras en 3 shares compatibles con SeedSplitter.
 - `recover.py`: reconstruye la seed original a partir de 2 shares.
-- `generate.py`: genera una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
-- `zpub.py`: recibe una seed BIP39 de 12 o 24 palabras, valida su checksum y exporta la cuenta BIP84 watch-only como `zpub` y QR.
+- `new.py`: crea una seed de 12 o 24 palabras, usando 50 tiradas de un dado físico o el generador seguro del sistema operativo.
+- `watch-only.py`: recibe una seed BIP39 de 12 o 24 palabras, valida su checksum y exporta la cuenta BIP84 watch-only como `zpub` y QR.
 
 ```bash
 python3 split.py
 python3 recover.py
-python3 generate.py
-python3 zpub.py
+python3 new.py
+python3 watch-only.py
 ```
 
 Para trabajar con una seed real, se recomienda ejecutar estos scripts en un Live OS (como Tails o Ubuntu), desde un USB y en una PC air-gapped, sin conexión a internet.
